@@ -2,19 +2,35 @@ import React, { useState, useEffect, useRef } from "react";
 import InputEmoji from "react-input-emoji";
 import { IoSend } from "react-icons/io5";
 
+const webSocket = new WebSocket("ws://localhost:3002");
+
+
+webSocket.onopen = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('roomId');
+  webSocket.send(JSON.stringify({
+    type: 'join',
+    payload: {
+      roomId: roomId
+    }
+  }));
+}
+
+
 const Chat = () => {
+
+
+  webSocket.onmessage = function (event) {
+    console.log(event);
+    const data = JSON.parse(event.data);
+    if (data.type === "message") {
+      setChats([...chats, data.payload.message]);
+    }
+  }
+
+
   const [message, setMessage] = useState("");
-  const [chats, setChats] = useState([
-    "Hello!",
-    "How are you?",
-    "I'm fine, thank you!",
-    "What about you?",
-    "I'm doing well too!",
-    "That's great!",
-    "Yes, it is!",
-    "How was your day?",
-    "It was good, how about yours?",
-  ]);
+  const [chats, setChats] = useState([]);
   const chatContainerRef = useRef(null);
 
   const handleMessageChange = (e) => {
@@ -23,16 +39,23 @@ const Chat = () => {
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
 
+
+
   const handleSendMessage = () => {
     if (message.trim() !== "") {
-      setChats([...chats, message]);
+      webSocket.send(JSON.stringify({
+        type: "message",
+        payload: {
+          message: message
+        }
+      }));
       setMessage("");
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // Prevents the default behavior of adding a newline
+      e.preventDefault();
       handleSendMessage();
     }
   };
