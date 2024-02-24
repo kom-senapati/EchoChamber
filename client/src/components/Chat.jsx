@@ -5,16 +5,6 @@ import { IoSend } from "react-icons/io5";
 const webSocket = new WebSocket("ws://localhost:3002");
 
 
-webSocket.onopen = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const roomId = urlParams.get('roomId');
-  webSocket.send(JSON.stringify({
-    type: 'join',
-    payload: {
-      roomId: roomId
-    }
-  }));
-}
 
 
 const Chat = () => {
@@ -22,10 +12,6 @@ const Chat = () => {
 
   webSocket.onmessage = function (event) {
     console.log(event);
-    const data = JSON.parse(event.data);
-    if (data.type === "message") {
-      setChats([...chats, data.payload.message]);
-    }
   }
 
 
@@ -44,10 +30,7 @@ const Chat = () => {
   const handleSendMessage = () => {
     if (message.trim() !== "") {
       webSocket.send(JSON.stringify({
-        type: "message",
-        payload: {
-          message: message
-        }
+        message: 'main amar hu'
       }));
       setMessage("");
     }

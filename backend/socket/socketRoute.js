@@ -17,7 +17,41 @@
 
  */
 
-let users = {
+// user has came and we have group
+
+/*
+   let group = {
+
+   }
+*/
+
+
+let roomId = [
+  1, 2, 3, 4
+]
+
+
+
+const socketRoute = (wss) => {
+  wss.on("connection", async (ws, req) => {
+    ws.on('event:join', (message) => {
+      const data = JSON.parse(message.toString());
+      if (!data) throw new Error('Invalid data');
+      try {
+        if(data.type == 'join'){
+          
+        }
+      } catch (error) {
+        
+      }
+    })
+  })
+}
+
+export default socketRoute;
+
+
+/* let users = {
   [""]: {
     room: "",
     ws: {}
@@ -59,6 +93,5 @@ const socketRoute = (wss) => {
       }
     })
   })
-}
+} */
 
-export default socketRoute;
