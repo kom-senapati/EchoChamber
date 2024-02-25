@@ -6,6 +6,7 @@ const route = express.Router();
 
 
 route.post('/register', async (req: Request, res: Response) => {
+
   const { username, email, password } = req.body;
   try {
     if (username === "" || email === "" || password === "") {
@@ -22,8 +23,7 @@ route.post('/register', async (req: Request, res: Response) => {
   } catch (error: any) {
     console.log(error);
     return res.status(401).json({ errormessage: error.message })
-  }
-})
+  }})
 
 
 
