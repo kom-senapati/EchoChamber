@@ -28,12 +28,13 @@ const Chat = () => {
 
 
   const handleSendMessage = () => {
-    if (message.trim() !== "") {
-      webSocket.send(JSON.stringify({
-        message: 'main amar hu'
-      }));
-      setMessage("");
-    }
+    // if (message.trim() !== "") {
+    //   webSocket.send(JSON.stringify({
+    //     message: 'main amar hu'
+    //   }));
+    //   setMessage("");
+    // }
+    setChats((prev) => ({...prev, message}))
   };
 
   const handleKeyDown = (e) => {
@@ -49,29 +50,40 @@ const Chat = () => {
   }, [chats]);
 
   return (
-    <div className="flex flex-col h-[80%] w-8/12 border border-gray-700 shadow-md rounded px-4 py-2">
-      <div ref={chatContainerRef} className="overflow-y-auto flex-grow">
-        {chats.map((chat, index) => (
-          <div className="chat chat-end">
-            <div className="chat-bubble">{chat}</div>
-          </div>
-        ))}
-      </div>
-      <div className="flex mt-2">
-        <InputEmoji
-          value={message}
-          onChange={setMessage}
-          onKeyDown={handleKeyDown}
-          shouldReturn
-          placeholder="Type your message..."
-          borderRadius={10}
-          fontSize={20}
-        />
-        <button onClick={handleSendMessage} className="btn btn-square">
-          <IoSend size={25} />
-        </button>
-      </div>
+    <main className="h-full w-full p-2 flex items-center justify-center">
+      <section className="flex  h-[80%] w-[80%] border border-gray-700 rounded-md">
+        <aside className="w-full flex-1 border-r border-gray-700 h-full ">
+          {/* Groups the current user currenly in */}
+
+        </aside>
+
+        <div className="flex flex-col flex-[3] w-full border border-none shadow-md rounded px-4 py-2">
+        <div ref={chatContainerRef} className="overflow-y-auto flex-grow">
+          {chats.map((chat, index) => (
+            <div className="chat chat-end">
+              <div className="chat-bubble">{chat}</div>
+            </div>
+          ))}
+        </div>
+        <div className="flex mt-2">
+          <InputEmoji
+            value={message}
+            onChange={setMessage}
+            onKeyDown={handleKeyDown}
+            shouldReturn
+            placeholder="Type your message..."
+            borderRadius={10}
+            fontSize={20}
+          />
+          <button onClick={handleSendMessage} className="btn btn-square">
+            <IoSend size={25} />
+          </button>
+        </div>
     </div>
+      </section>
+    
+    </main>
+
   );
 };
 
