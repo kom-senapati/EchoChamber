@@ -23,7 +23,7 @@ function Login() {
       console.log(resp)
       if (resp.status === 200 && resp.statusText === 'OK') {
         console.log(resp.data);
-        setCurrentUser(resp.data.user);
+        setCurrentUser(resp.data);
         navigate('/home')
       }
     } catch (error) {

@@ -9,13 +9,12 @@ import axios from 'axios';
 export default function Dummychat() {
 
   const apiEndpoint = 'http://localhost:3000/'
-
   const [roomName, setRoomName] = useState('');
   const [error, setError] = useState('');
   const [searchUserTerm, setsearchUserTerm] = useState('');
   const [selectedUsers, setSelectedUsers] = useState([])
   const [chats, setChats] = useState([]);
-
+  const [userFromDB, setuserFromDB] = useState([])
   const { currentUser, setCurrentUser } = useContext(userInfo);
   const navigate = useNavigate()
 
@@ -23,12 +22,12 @@ export default function Dummychat() {
     getGroups();
 
   }, [currentUser])
-
+ console.log(currentUser)
   const getGroups = useCallback(async () => {
     try {
-      const resp = await axios.get(`${apiEndpoint}chat/getchats`, {
+      const resp = await axios.get(`/chat/getchats`, {
         params: {
-          currentUserId: currentUser._id
+          currentUserId: currentUser?._id
         }
       })
       if (resp.status == 200) {
@@ -51,6 +50,31 @@ export default function Dummychat() {
     setError('')
   }
 
+  const createRoomClick = () => {
+      console.log(roomName);
+      console.log(selectedUsers)
+      console.log(currentUser)
+      const createRoom = async() => {
+        const resp = await axios.post('/chat/creategroup',{
+          groupusers: selectedUsers,
+          groupname:roomName,
+          user:currentUser
+        })
+        if(resp){
+
+          console.log(resp)
+        }
+      }
+      createRoom()
+  }
+
+
+
+
+
+
+
+console.log(selectedUsers)
   return (
     <main className='h-full w-full flex items-center justify-center'>
 
@@ -88,7 +112,7 @@ export default function Dummychat() {
           {/* Open the modal using document.getElementById('ID').showModal() method */}
           <dialog id="my_modal_2" className="modal ">
             <div className="modal-box flex flex-col gap-2 overflow-visible">
-              <h3 className="font-bold text-lg">Add room members</h3>
+              <h3 className="font-bold text-lg">Add room members: {roomName}</h3>
               <div className='relative py-1 flex  w-full gap-2'>
                 <input
                   type="text"
@@ -101,27 +125,29 @@ export default function Dummychat() {
                 <div className='flex flex-col max-h-32 bg-white rounded-md overflow-y-scroll w-full'>
                   {
 
-
-                    selectedUsers && selectedUsers.length !== 0 && (
-                      selectedUsers.map((user) => (
-                        <div className='p-2 cursor-pointer' onClick={() => setSelectedUsers((prev) => (prev.filter((usr) => usr.id !== user.id)))}>
-                          {user.name}
-                        </div>
-                      ))
-                    )
-                  }
-                </div>
-
-                {/* User select input */}
-                {
-                  users.filter((user) => user.name.includes(searchUserTerm)).length !== 0 && searchUserTerm !== '' ?
-                    (
-                      <div className=' h-32 -bottom-12 overflow-scroll w-60 z-10 bg-white rounded-md absolute '>
-                        {
-                          users.filter((user) => user.name.includes(searchUserTerm)).map((usr) => (
-                            <div key={usr.id} className='p-2 cursor-pointer' onClick={() => setSelectedUsers((prev) => ([...prev, usr]))}>
-                              {usr.name}
-                            </div>
+                
+                 selectedUsers && selectedUsers.length !== 0 && (
+                    selectedUsers.map((user, idx) => (
+                      <div key={idx} className='p-2 cursor-pointer' onClick={() => setSelectedUsers((prev) => (prev.filter((usr) => usr._id !== user._id)))}>
+                        {user.username}
+                      </div>
+                    ))
+                 )
+              }
+              </div>
+              
+              {/* User select input */}
+              {
+                userFromDB?.filter((user) => user.username.includes(searchUserTerm)).length !== 0 && searchUserTerm !== '' ?
+                (
+                  <div className=' h-32 -bottom-20 overflow-scroll w-60 z-10 bg-white rounded-md absolute '>
+                  {
+                    userFromDB
+                    .filter((user) => user._id !== currentUser)
+                    .filter((user) => user.username.includes(searchUserTerm)).map((usr) => (
+                      <div key={usr._id} className='p-2 cursor-pointer' onClick={() => setSelectedUsers((prev) => ([...prev, usr]))}>
+                        {usr.username}
+                      </div>
 
                           ))
                         }
@@ -132,7 +158,8 @@ export default function Dummychat() {
 
 
               </div>
-
+              <button className='btn' onClick={createRoomClick}>Create room</button>
+              
             </div>
           </dialog>
         </aside>

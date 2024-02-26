@@ -21,6 +21,7 @@ app.use('/chat', chatRoute_1.default);
 if (process.env.db) {
     console.log(process.env.db);
     mongoose_1.default.connect(process.env.db, { dbName: "chat" });
+    console.log('succesfully connected to gb');
 }
 else {
     console.log('cant connect to db');

@@ -46,14 +46,8 @@ route.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(400).json({ errormessage: 'email not exists' });
     }
     try {
-        if (password === (isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists.password)) {
-            let userObj = {
-                _id: isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists._id,
-                name: isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists.username,
-                email: isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists.email
-            };
-            res.status(200).json({ message: 'logged in succesfully', user: userObj });
-        }
+        if (password === (isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists.password))
+            res.status(200).json({ message: 'logged in succesfully', data: isEmailExists });
     }
     catch (error) {
         console.log(error);
@@ -63,6 +57,18 @@ route.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* (
 route.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userList = yield db_1.User.find({ username: { $regex: '.*' + req.query.search + '.*' } });
+        if (!userList)
+            res.status(401).json({ message: ' user with specific not foound' });
+        res.status(200).json({ userList });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(401).json({ errormessage: error.message });
+    }
+}));
+route.get('/getUsers', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userList = yield db_1.User.find();
         if (!userList)
             res.status(401).json({ message: ' user with specific not foound' });
         res.status(200).json({ userList });
