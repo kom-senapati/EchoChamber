@@ -12,7 +12,7 @@ function App() {
       <Routes >
         <Route path="/" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="select" element={<DummyChat />} />
+        <Route path="/select" element={<DummyChat />} />
 
         <Route path="/group/:groupId" element={< Chat/>} />
       </Routes>
