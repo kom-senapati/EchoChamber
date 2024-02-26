@@ -15,9 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("../db");
 const route = express_1.default.Router();
-route.get('/getmessage/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+route.get('/getmessage', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const messages = yield db_1.Message.find({ chat: req.params.chatId }).populate("sender", "name pic email").populate("chat");
+        const messages = yield db_1.Message.find({ chat: req.query.chatId }).populate("sender").populate("chat");
         res.status(200).json(messages);
     }
     catch (error) {

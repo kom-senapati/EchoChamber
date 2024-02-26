@@ -23,7 +23,8 @@ route.post('/register', async (req: Request, res: Response) => {
   } catch (error: any) {
     console.log(error);
     return res.status(401).json({ errormessage: error.message })
-  }})
+  }
+})
 
 
 
@@ -32,13 +33,21 @@ route.post('/login', async (req: Request, res: Response) => {
   if (email == "" || password == "") {
     res.status(400).json({ errormessage: 'fields are empty' })
   }
+
   const isEmailExists = await User.findOne({ email })
+
   if (!isEmailExists) {
     res.status(400).json({ errormessage: 'email not exists' })
   }
   try {
-    if (password === isEmailExists?.password)
-      res.status(200).json({ message: 'logged in succesfully' })
+    if (password === isEmailExists?.password) {
+      let userObj = {
+        _id: isEmailExists?._id,
+        name: isEmailExists?.username,
+        email: isEmailExists?.email
+      }
+      res.status(200).json({ message: 'logged in succesfully', user: userObj })
+    }
   } catch (error: any) {
     console.log(error);
     res.status(401).json({ errormessage: error.message })

@@ -46,8 +46,14 @@ route.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(400).json({ errormessage: 'email not exists' });
     }
     try {
-        if (password === (isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists.password))
-            res.status(200).json({ message: 'logged in succesfully' });
+        if (password === (isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists.password)) {
+            let userObj = {
+                _id: isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists._id,
+                name: isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists.username,
+                email: isEmailExists === null || isEmailExists === void 0 ? void 0 : isEmailExists.email
+            };
+            res.status(200).json({ message: 'logged in succesfully', user: userObj });
+        }
     }
     catch (error) {
         console.log(error);

@@ -18,12 +18,28 @@ const db_1 = require("../db");
 const route = express_1.default.Router();
 route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const chats = yield db_1.Chat.find({ users: { $elemMatch: { $eq: req.body.currentUserId } } }).populate("users", "-password").populate("groupAdmin", "-password").populate("latestMessage").sort({ updatedAt: -1 });
-        const chatList = yield db_1.User.populate(chats, {
-            path: "latestMessage.sender"
-        });
-        console.log(chatList);
-        res.status(200).json(chatList);
+        if (!req.query.currentUserId)
+            res.status(400).json({ errormessage: 'invalid Id' });
+        else {
+            let chats = yield db_1.Chat.find({ users: { $elemMatch: { $eq: req.query.currentUserId } } }).populate("users", "-password").populate("groupAdmin", "-password").populate("latestMessage").sort({ updatedAt: -1 });
+            /*       const chats = await Chat.aggregate([
+                    {
+                      $match: {
+                        _id: mongoose.Types.ObjectId(req.query.currentUserId),
+                        $or: [
+                          { groupAdmin: mongoose.Types.ObjectId(req.query.currentUserId) }, // Check for groupAdmin
+                          { users: { $elemMatch: { $eq: req.query.currentUserId } } }
+                           // Check if user is in users array
+                        ]
+                      }
+                    }
+                  ]); */
+            /*       console.log(chats);
+             */ const chatList = yield db_1.User.populate(chats, {
+                path: "latestMessage.sender"
+            });
+            res.status(200).json(chatList);
+        }
     }
     catch (error) {
         console.log(error.message);

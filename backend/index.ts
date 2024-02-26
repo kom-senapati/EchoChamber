@@ -19,6 +19,8 @@ app.use('/message', messageRoute)
 app.use('/chat', chatRoute)
 
 if (process.env.db) {
+  console.log(process.env.db);
+
   mongoose.connect(process.env.db, { dbName: "chat" } as ConnectOptions)
 } else {
   console.log('cant connect to db');
@@ -49,15 +51,16 @@ io.on('connection', (socket) => {
     console.log("User Joined Room: " + room);
   });
 
-  socket.on("new-message", (newMessageRecieved) => {
-    var chat = newMessageRecieved.chat;
 
+
+  socket.on("new-message", (newMessageRecieved) => {
+    console.log(newMessageRecieved)
+    var chat = newMessageRecieved.chat;
     if (!chat.users) return console.log("chat.users not defined");
 
     chat.users.forEach((user: any) => {
       if (user._id == newMessageRecieved.sender._id) return;
-
-      socket.in(user._id).emit("message recieved", newMessageRecieved);
+      socket.to(chat._id).emit("new-message", newMessageRecieved);
     });
   });
 

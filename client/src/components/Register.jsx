@@ -2,6 +2,9 @@ import { useState } from "react";
 import axios from 'axios';
 
 function Register() {
+
+  const apiEndpoint = 'http://localhost:3000/'
+
   const [data, setData] = useState({
     username: '',
     email: '',
@@ -11,38 +14,38 @@ function Register() {
   const [error, setError] = useState('');
 
   const handleOnChange = (e) => {
-    setData((prev) => ({...prev, [e.target.name] : e.target.value}))
-    console.log(data)
-  }
-  const handleOnSubmit = async(e) => {
-    e.preventDefault()
-    console.log(data)
+    setData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
 
-   
+  }
+  const handleOnSubmit = async (e) => {
+    e.preventDefault()
+    /* console.log(data) */
     try {
-      if(data.password !== data.confirm_password){
+      if (data.password !== data.confirm_password) {
         setError('passwords do not match');
         return
       }
-
-      const resp = await axios.post('/user/register',{
+      const resp = await axios.post(`${apiEndpoint}user/register`, {
         username: data.username,
         email: data.email,
         password: data.password
       })
-      console.log(resp)
+      if (resp.status == 200 && resp.statusText === 'OK') {
+        console.log(resp)
+        alert(resp.data.message)
+      }
     } catch (error) {
       console.log(setError)
     }
-    
+
     setData({
       username: '',
       email: '',
-    password: '',
-    confirm_password: ''
+      password: '',
+      confirm_password: ''
     })
   }
-console.log(data)
+  console.log(data)
   return (
     <div className="hero min-h-screen bg-base-200">
       <div className="hero-content flex-col lg:flex-row-reverse">
@@ -55,7 +58,7 @@ console.log(data)
         </div>
         <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
           <form className="card-body" onSubmit={handleOnSubmit}>
-          <div className="form-control">
+            <div className="form-control">
               <label className="label">
                 <span className="label-text">Username</span>
               </label>
@@ -113,7 +116,7 @@ console.log(data)
             </div>
             {
               error !== '' &&
-            <p className="text-red-500 text-sm p-1">{error}</p>
+              <p className="text-red-500 text-sm p-1">{error}</p>
             }
             <div className="form-control mt-3">
               <button type="submit" className="btn btn-primary">Register</button>

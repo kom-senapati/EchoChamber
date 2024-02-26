@@ -19,6 +19,7 @@ app.use('/user', userRoute_1.default);
 app.use('/message', messageRoute_1.default);
 app.use('/chat', chatRoute_1.default);
 if (process.env.db) {
+    console.log(process.env.db);
     mongoose_1.default.connect(process.env.db, { dbName: "chat" });
 }
 else {
@@ -44,13 +45,14 @@ io.on('connection', (socket) => {
         console.log("User Joined Room: " + room);
     });
     socket.on("new-message", (newMessageRecieved) => {
+        console.log(newMessageRecieved);
         var chat = newMessageRecieved.chat;
         if (!chat.users)
             return console.log("chat.users not defined");
         chat.users.forEach((user) => {
             if (user._id == newMessageRecieved.sender._id)
                 return;
-            socket.in(user._id).emit("message recieved", newMessageRecieved);
+            socket.to(chat._id).emit("new-message", newMessageRecieved);
         });
     });
 });

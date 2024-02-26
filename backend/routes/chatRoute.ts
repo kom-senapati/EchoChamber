@@ -8,12 +8,30 @@ const route = express.Router();
 
 route.get('/getchats', async (req: Request, res: Response) => {
   try {
-    const chats = await Chat.find({ users: { $elemMatch: { $eq: req.body.currentUserId } } }).populate("users", "-password").populate("groupAdmin", "-password").populate("latestMessage").sort({ updatedAt: -1 })
-    const chatList = await User.populate(chats, {
-      path: "latestMessage.sender"
-    })
-    console.log(chatList);
-    res.status(200).json(chatList);
+    if (!req.query.currentUserId) res.status(400).json({ errormessage: 'invalid Id' })
+    else {
+      let chats = await Chat.find({ users: { $elemMatch: { $eq: req.query.currentUserId } } }).populate("users", "-password").populate("groupAdmin", "-password").populate("latestMessage").sort({ updatedAt: -1 })
+
+
+
+      /*       const chats = await Chat.aggregate([
+              {
+                $match: {
+                  _id: mongoose.Types.ObjectId(req.query.currentUserId),
+                  $or: [
+                    { groupAdmin: mongoose.Types.ObjectId(req.query.currentUserId) }, // Check for groupAdmin
+                    { users: { $elemMatch: { $eq: req.query.currentUserId } } }
+                     // Check if user is in users array
+                  ]
+                }
+              }
+            ]); */
+/*       console.log(chats);
+ */      const chatList = await User.populate(chats, {
+        path: "latestMessage.sender"
+      })
+      res.status(200).json(chatList);
+    }
   } catch (error: any) {
     console.log(error.message);
     res.status(401).json({ errormessage: error.message })

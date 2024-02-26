@@ -5,9 +5,9 @@ import { Message, User, Chat } from "../db"
 const route = express.Router();
 
 
-route.get('/getmessage/:id', async (req: Request, res: Response) => {
+route.get('/getmessage', async (req: Request, res: Response) => {
   try {
-    const messages = await Message.find({ chat: req.params.chatId }).populate("sender", "name pic email").populate("chat");
+    const messages = await Message.find({ chat: req.query.chatId }).populate("sender").populate("chat");
     res.status(200).json(messages)
   } catch (error: any) {
     console.log(error);

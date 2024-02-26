@@ -1,8 +1,12 @@
 import axios from "axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { userInfo } from "../App";
 
 function Login() {
+  const apiEndpoint = 'http://localhost:3000/'
+  const { currentUser, setCurrentUser } = useContext(userInfo);
+
   const [data, setData] = useState({
     email: '',
     password: '',
@@ -10,21 +14,21 @@ function Login() {
   const navigate = useNavigate()
 
   const handleChange = (e) => {
-    setData((prev) => ({...prev, [e.target.name] : e.target.value}));
+    setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const resp = await axios.post('/user/login',data)
-    console.log(resp)
-    if(resp.status === 200){
-      navigate('/select')
+    try {
+      const resp = await axios.post(`${apiEndpoint}user/login`, data)
+      console.log(resp)
+      if (resp.status === 200 && resp.statusText === 'OK') {
+        console.log(resp.data);
+        setCurrentUser(resp.data.user);
+        navigate('/home')
+      }
+    } catch (error) {
+      console.log(error);
     }
-    setData({
-      email: '',
-      password: '',
-    });
-
   }
 
   return (
