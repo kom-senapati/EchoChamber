@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { users } from "../utils"
 import { userInfo } from '../App';
 import axios from 'axios';
+import { parseCookies } from 'nookies';
 
 
 
@@ -18,16 +19,30 @@ export default function Dummychat() {
   const { currentUser, setCurrentUser } = useContext(userInfo);
   const navigate = useNavigate()
 
+  const cookie = parseCookies()
+  const userId =  cookie['userId']
+  if( userId == undefined){
+    navigate('/login')
+  }
   useEffect(() => {
-    getGroups();
+    const fetchUser = async() => {
+      const resp = await axios.get('/user/getUsers')
+      console.log(resp.data.userList)
+      setuserFromDB(resp.data.userList)
+    }
+    fetchUser()
+  }, [userId])
 
-  }, [currentUser])
- console.log(currentUser)
+  useEffect(() => {
+    getGroups()
+  }, [userId])
+ console.log(userId)
   const getGroups = useCallback(async () => {
+    
     try {
       const resp = await axios.get(`/chat/getchats`, {
         params: {
-          currentUserId: currentUser?._id
+          currentUserId: userId 
         }
       })
       if (resp.status == 200) {
@@ -53,12 +68,12 @@ export default function Dummychat() {
   const createRoomClick = () => {
       console.log(roomName);
       console.log(selectedUsers)
-      console.log(currentUser)
+      console.log(userId)
       const createRoom = async() => {
         const resp = await axios.post('/chat/creategroup',{
           groupusers: selectedUsers,
           groupname:roomName,
-          user:currentUser
+          user:userId
         })
         if(resp){
 
@@ -143,7 +158,7 @@ console.log(selectedUsers)
                   <div className=' h-32 -bottom-20 overflow-scroll w-60 z-10 bg-white rounded-md absolute '>
                   {
                     userFromDB
-                    .filter((user) => user._id !== currentUser)
+                    .filter((user) => user._id !== userId)
                     .filter((user) => user.username.includes(searchUserTerm)).map((usr) => (
                       <div key={usr._id} className='p-2 cursor-pointer' onClick={() => setSelectedUsers((prev) => ([...prev, usr]))}>
                         {usr.username}
