@@ -22,6 +22,7 @@ if (process.env.db) {
   console.log(process.env.db);
 
   mongoose.connect(process.env.db, { dbName: "chat" } as ConnectOptions)
+  console.log('succesfully connected to gb')
 } else {
   console.log('cant connect to db');
 }

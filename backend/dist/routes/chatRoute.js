@@ -18,6 +18,7 @@ const db_1 = require("../db");
 const route = express_1.default.Router();
 route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log(req.params.currentUserId);
         if (!req.query.currentUserId)
             res.status(400).json({ errormessage: 'invalid Id' });
         else {

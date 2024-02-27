@@ -18,6 +18,7 @@ const route = express_1.default.Router();
 route.get('/getmessage', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const messages = yield db_1.Message.find({ chat: req.query.chatId }).populate("sender").populate("chat");
+        console.log(messages);
         res.status(200).json(messages);
     }
     catch (error) {

@@ -5,6 +5,7 @@ import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 import { userInfo } from "../App";
 import axios from "axios";
+import { parseCookies } from "nookies";
 
 const ENDPOINT = "http://localhost:3000";
 let socket, selectedChatCompare;
@@ -12,16 +13,20 @@ let socket, selectedChatCompare;
 const Chat = () => {
   const apiEndpoint = "http://localhost:3000/";
   const { groupId } = useParams();
-  const { currentUser, setCurrentUser } = useContext(userInfo);
+  // const { currentUser, setCurrentUser } = useContext(userInfo);
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
   const chatContainerRef = useRef(null);
   const [selectedChat, setSelectedChat] = useState();
 
+  const cookie = parseCookies()
+  const userId =  cookie['userId']
+
   useEffect(() => {
     fetchMessages();
-    socket = io(ENDPOINT);
-  }, []);
+    socket = io(ENDPOINT)
+  }, [])
+
 
   useEffect(() => {
     socket.on("new-message", (incoming_message) => {
@@ -34,7 +39,7 @@ const Chat = () => {
 
   const fetchMessages = async () => {
     try {
-      const resp = await axios.get(`${apiEndpoint}message/getmessage`, {
+      const resp = await axios.get(`/message/getmessage`, {
         params: {
           chatId: groupId,
         },
@@ -58,16 +63,17 @@ const Chat = () => {
 
   const handleSendMessage = async () => {
     try {
-      const resp = await axios.post(`${apiEndpoint}message/sendmessage`, {
-        userId: currentUser._id,
+      const resp = await axios.post(`/message/sendmessage`, {
+        userId: userId,
         content: message,
         chatId: selectedChat,
       });
       if (resp.status == 200) {
         console.log(resp.data);
+        socket.emit('new-message', (resp.data))
         setChats([...chats, resp.data]);
-        socket.emit("new-message", resp.data);
       }
+      setMessage('')
     } catch (error) {
       console.log(error);
     }
@@ -77,6 +83,7 @@ const Chat = () => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSendMessage();
+      
     }
   };
 
@@ -92,15 +99,11 @@ const Chat = () => {
             <div ref={chatContainerRef} className="overflow-y-auto flex-grow">
               {chats.map((chat, index) => (
                 <>
-                  {chat.sender._id === currentUser._id ? (
+
+                  {chat.sender._id !== userId ? (
                     <>
-                      <div key={index} className="chat chat-end">
-                        <div className="chat-header">
-                          {chat.sender.username}
-                        </div>
-                        <div className="chat-bubble chat-bubble-primary">
-                          {chat.content}
-                        </div>
+                      <div key={index} className="chat chat-end bg-white">
+                        <div className="chat-bubble ">{chat.content}</div>
                       </div>
                     </>
                   ) : (

@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { parseCookies, setCookie } from "nookies";
 
 function Register() {
 
   const apiEndpoint = 'http://localhost:3000/'
 
+  const cookie = parseCookies()
+  const userId =  cookie['userId']
+  const navigate = useNavigate()
+  if(userId !== undefined){
+    navigate('/home')
+  }
   const [data, setData] = useState({
     username: '',
     email: '',
@@ -26,14 +33,16 @@ function Register() {
         setError('passwords do not match');
         return
       }
-      const resp = await axios.post(`${apiEndpoint}user/register`, {
+      const resp = await axios.post(`user/register`, {
         username: data.username,
         email: data.email,
         password: data.password
       })
       if (resp.status == 200 && resp.statusText === 'OK') {
-        console.log(resp)
+        console.log(resp.data)
         alert(resp.data.message)
+        setCookie(null,'userId', resp.data.data._id)
+        navigate('/login')
       }
     } catch (error) {
       console.log(setError)
@@ -46,7 +55,6 @@ function Register() {
       confirm_password: ''
     })
   }
-  console.log(data)
   return (
     <div className="hero min-h-screen bg-base-200">
       <div className="hero-content flex-col lg:flex-row-reverse">

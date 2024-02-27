@@ -2,16 +2,18 @@ import axios from "axios";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { userInfo } from "../App";
+import { parseCookies, setCookie } from 'nookies'
 
 function Login() {
   const apiEndpoint = 'http://localhost:3000/'
   const { currentUser, setCurrentUser } = useContext(userInfo);
-
+  const cookie = parseCookies()
+  const userId =  cookie['userId']
+  const navigate = useNavigate()
   const [data, setData] = useState({
     email: '',
     password: '',
   });
-  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -22,8 +24,9 @@ function Login() {
       const resp = await axios.post(`${apiEndpoint}user/login`, data)
       console.log(resp)
       if (resp.status === 200 && resp.statusText === 'OK') {
-        console.log(resp.data);
-        setCurrentUser(resp.data.user);
+        console.log(resp?.data?.data._id);
+        setCurrentUser(resp.data);
+        setCookie(null, 'userId', resp?.data?.data._id)
         navigate('/home')
       }
     } catch (error) {
