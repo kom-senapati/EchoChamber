@@ -19,7 +19,7 @@ route.post('/register', async (req: Request, res: Response) => {
     }
     const saveUser = new User(req.body);
     const isSaved = await saveUser.save();
-    if (isSaved) res.json({ message: 'User created successfully' });
+    if (isSaved) res.json({ message: 'User created successfully' , data: isSaved});
   } catch (error: any) {
     console.log(error);
     return res.status(401).json({ errormessage: error.message })

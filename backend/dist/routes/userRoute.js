@@ -29,7 +29,7 @@ route.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function
         const saveUser = new db_1.User(req.body);
         const isSaved = yield saveUser.save();
         if (isSaved)
-            res.json({ message: 'User created successfully' });
+            res.json({ message: 'User created successfully', data: isSaved });
     }
     catch (error) {
         console.log(error);
