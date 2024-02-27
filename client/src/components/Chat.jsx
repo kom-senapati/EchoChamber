@@ -26,7 +26,7 @@ const Chat = () => {
     fetchMessages();
     socket = io(ENDPOINT)
   }, [])
-
+console.log(groupId)
 
   useEffect(() => {
     socket.on("new-message", (incoming_message) => {
@@ -45,9 +45,11 @@ const Chat = () => {
         },
       });
       if (resp.status == 200) {
-        /*         console.log(resp.data[0]);
-         */ setChats(resp.data);
-        setSelectedChat(resp.data[0].chat._id);
+        if(resp.data){
+          setChats(resp.data);
+        setSelectedChat(resp.data[0]?.chat._id);
+        }
+        
         socket.emit("join-chat", groupId);
       }
     } catch (error) {
@@ -66,7 +68,7 @@ const Chat = () => {
       const resp = await axios.post(`/message/sendmessage`, {
         userId: userId,
         content: message,
-        chatId: selectedChat,
+        chatId: groupId,
       });
       if (resp.status == 200) {
         console.log(resp.data);
@@ -100,10 +102,10 @@ const Chat = () => {
               {chats.map((chat, index) => (
                 <>
 
-                  {chat.sender._id !== userId ? (
+                  {chat.sender._id === userId ? (
                     <>
-                      <div key={index} className="chat chat-end bg-white">
-                        <div className="chat-bubble ">{chat.content}</div>
+                      <div key={index} className="chat chat-end ">
+                        <div className="chat-bubble bg-white">{chat.content}</div>
                       </div>
                     </>
                   ) : (
