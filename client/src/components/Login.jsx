@@ -1,38 +1,38 @@
 import axios from "axios";
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { userInfo } from "../App";
-import { parseCookies, setCookie } from 'nookies'
+import { parseCookies, setCookie } from "nookies";
 
 function Login() {
-  const apiEndpoint = 'http://localhost:3000/'
+  const apiEndpoint = "http://localhost:3000/";
   const { currentUser, setCurrentUser } = useContext(userInfo);
-  const cookie = parseCookies()
-  const userId =  cookie['userId']
-  const navigate = useNavigate()
+  const cookie = parseCookies();
+  const userId = cookie["userId"];
+  const navigate = useNavigate();
   const [data, setData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const handleChange = (e) => {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const resp = await axios.post(`${apiEndpoint}user/login`, data)
-      console.log(resp)
-      if (resp.status === 200 && resp.statusText === 'OK') {
+      const resp = await axios.post(`${apiEndpoint}user/login`, data);
+      console.log(resp);
+      if (resp.status === 200 && resp.statusText === "OK") {
         console.log(resp?.data?.data._id);
         setCurrentUser(resp.data);
-        setCookie(null, 'userId', resp?.data?.data._id)
-        navigate('/home')
+        setCookie(null, "userId", resp?.data?.data._id);
+        navigate("/home");
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
     <div className="hero min-h-screen bg-base-200">
@@ -52,7 +52,7 @@ function Login() {
               </label>
               <input
                 type="email"
-                name='email'
+                name="email"
                 placeholder="email"
                 className="input input-bordered"
                 required
@@ -66,23 +66,26 @@ function Login() {
               </label>
               <input
                 type="password"
-                name='password'
+                name="password"
                 placeholder="password"
                 className="input input-bordered"
                 required
                 value={data.password}
                 onChange={handleChange}
               />
-              <label className="label">
-                <a href="#" className="label-text-alt link link-hover">
-                  Forgot password?
-                </a>
-              </label>
             </div>
             <div className="form-control mt-6">
-              <button type="submit" className="btn btn-primary">Login</button>
+              <button type="submit" className="btn btn-primary">
+                Login
+              </button>
             </div>
           </form>
+          <div className="card-body inline-block pt-0">
+            Dont have an account ?{" "}
+            <Link to="/" className="hover:text-accent">
+              Register
+            </Link>
+          </div>
         </div>
       </div>
     </div>

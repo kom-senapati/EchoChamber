@@ -39,6 +39,19 @@ route.get('/getchats', async (req: Request, res: Response) => {
   }
 })
 
+route.get('/getChatById', async (req: Request, res: Response) => {
+  try {
+    if (!req.query.chamberId) res.status(400).json({ errormessage: 'invalid Id' })
+    else {
+      let chamber = await Chat.find({ _id: req.query.chamberId }).populate("users", "-password")
+      res.status(200).json(chamber);
+    }
+  } catch (error: any) {
+    console.log(error.message);
+    res.status(401).json({ errormessage: error.message })
+  }
+})
+
 route.post('/creategroup', async (req: Request, res: Response) => {
 
   const { groupusers, groupname, user } = req.body

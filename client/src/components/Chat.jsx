@@ -1,11 +1,18 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import InputEmoji from "react-input-emoji";
 import { IoSend } from "react-icons/io5";
+import { LuAlignRight } from "react-icons/lu";
+import { IoArrowBackCircleOutline } from "react-icons/io5";
 import io from "socket.io-client";
-import { useParams } from "react-router-dom";
-import { userInfo } from "../App";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { parseCookies } from "nookies";
+import { format, register } from "timeago.js";
 
 const ENDPOINT = "http://localhost:3000";
 let socket, selectedChatCompare;
@@ -17,16 +24,45 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
   const chatContainerRef = useRef(null);
-  const [selectedChat, setSelectedChat] = useState();
+  const [users, setUsers] = useState([]);
+  const [chamber, setChamber] = useState("");
 
-  const cookie = parseCookies()
-  const userId =  cookie['userId']
+  const navigate = useNavigate();
+  const cookie = parseCookies();
+  const userId = cookie["userId"];
+  if (userId === undefined) {
+    navigate("/login");
+  }
+  const customTimeTemplate = (number, index, totalSec) => {
+    // number: the timeago / timein number;
+    // index: the index of array below;
+    // totalSec: total seconds between date to be formatted and today's date;
+    return [
+      ["just now", "right now"],
+      ["%ssec ago", "in %s seconds"],
+      ["1m ago", "in 1 minute"],
+      ["%sm ago", "in %s minutes"],
+      ["1h ago", "in 1 hour"],
+      ["%sh ago", "in %s hours"],
+      ["1d ago", "in 1 day"],
+      ["%sd ago", "in %s days"],
+      ["1w ago", "in 1 week"],
+      ["%sw ago", "in %s weeks"],
+      ["1mon ago", "in 1 month"],
+      ["%smon ago", "in %s months"],
+      ["1y ago", "in 1 year"],
+      ["%syrs ago", "in %s years"],
+    ][index];
+  };
+  // register your custom with timeago
+  register("custom-time-template", customTimeTemplate);
 
   useEffect(() => {
+    getUsers();
     fetchMessages();
-    socket = io(ENDPOINT)
-  }, [])
-console.log(groupId)
+    socket = io(ENDPOINT);
+  }, []);
+  console.log(groupId);
 
   useEffect(() => {
     socket.on("new-message", (incoming_message) => {
@@ -37,6 +73,23 @@ console.log(groupId)
     chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
   });
 
+  const getUsers = useCallback(async () => {
+    try {
+      const resp = await axios.get(`/chat/getChatById`, {
+        params: {
+          chamberId: groupId,
+        },
+      });
+      setChamber(resp.data[0].chatName);
+      setUsers(resp.data[0].users);
+      if (resp.status == 200) {
+        console.log(resp.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [chats]);
+
   const fetchMessages = async () => {
     try {
       const resp = await axios.get(`/message/getmessage`, {
@@ -45,11 +98,11 @@ console.log(groupId)
         },
       });
       if (resp.status == 200) {
-        if(resp.data){
+        if (resp.data) {
           setChats(resp.data);
-        setSelectedChat(resp.data[0]?.chat._id);
+          setSelectedChat(resp.data[0]?.chat._id);
         }
-        
+
         socket.emit("join-chat", groupId);
       }
     } catch (error) {
@@ -72,10 +125,10 @@ console.log(groupId)
       });
       if (resp.status == 200) {
         console.log(resp.data);
-        socket.emit('new-message', (resp.data))
+        socket.emit("new-message", resp.data);
         setChats([...chats, resp.data]);
       }
-      setMessage('')
+      setMessage("");
     } catch (error) {
       console.log(error);
     }
@@ -85,41 +138,115 @@ console.log(groupId)
     if (e.key === "Enter") {
       e.preventDefault();
       handleSendMessage();
-      
     }
   };
 
   return (
     <>
-      <input onChange={(e) => setCurrentUser(e.target.value)} />
       <main className="h-full w-full p-2 flex items-center justify-center">
-        <section className="flex  h-[80%] w-[80%] border border-gray-700 rounded-md">
-          <aside className="w-full flex-1 border-r border-gray-700 h-full ">
-            {/* Groups the current user currenly in */}
+        <section className="flex h-full w-full md:h-[80%] md:w-[80%] border border-gray-700 rounded-md bg-neutral">
+          <aside className="w-full flex-1 border-r border-gray-700 px-10 py-0 h-full menu bg-base-200 rounded hidden md:block">
+            <h3 className="py-4 text-xl font-bold mb-2 text-accent">
+              Users in {chamber}
+            </h3>
+            {users.map((user, i) => (
+              <div className="flex items-center">
+                <div className="avatar">
+                  <div className="w-8 rounded-box">
+                    <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                  </div>
+                </div>
+                <p className="font-semibold text-lg p-2 rounded-md cursor-pointer">
+                  {user.username}
+                </p>
+              </div>
+            ))}
           </aside>
-          <div className="flex flex-col flex-[3] w-full border border-none shadow-md rounded px-4 py-2">
-            <div ref={chatContainerRef} className="overflow-y-auto flex-grow">
-              {chats.map((chat, index) => (
-                <>
-
-                  {chat.sender._id === userId ? (
-                    <>
-                      <div key={index} className="chat chat-end ">
-                        <div className="chat-bubble bg-white">{chat.content}</div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div key={index} className="chat chat-start">
-                        <div className="chat-header">
-                          {chat.sender.username}
+          <div className="flex flex-col flex-[3] w-full border border-none shadow-md rounded px-4 py-2 bg-base-200 relative">
+            <IoArrowBackCircleOutline
+              size={40}
+              className="absolute top-3 -left-5 border-2 border-base-200 bg-base-200 rounded-full cursor-pointer text-accent hidden md:block"
+              onClick={() => navigate(-1)}
+            />
+            <div className="flex items-center justify-between md:justify-center font-semibold text-center text-accent text-xl pt-2 pb-4 md:pt-2 md:pb-2 shadow-base-100 shadow-sm">
+              {chamber}
+              <div className="drawer md:hidden z-[5] w-fit">
+                <input
+                  id="my-drawer"
+                  type="checkbox"
+                  className="drawer-toggle"
+                />
+                <div className="drawer-content">
+                  {/* Page content here */}
+                  <label htmlFor="my-drawer" className="drawer-button">
+                    <LuAlignRight size={28} />
+                  </label>
+                </div>
+                <div className="drawer-side">
+                  <label
+                    htmlFor="my-drawer"
+                    aria-label="close sidebar"
+                    className="drawer-overlay"
+                  ></label>
+                  <aside className="w-72 flex-1 border-r border-gray-700 px-10 h-full menu bg-base-200 rounded ">
+                    <h3 className="py-4 text-xl font-bold mb-2 text-accent">
+                      Users in {chamber}
+                    </h3>
+                    {users.map((user, i) => (
+                      <div className="flex items-center">
+                        <div className="avatar">
+                          <div className="w-8 rounded-box">
+                            <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                          </div>
                         </div>
-                        <div className="chat-bubble">{chat.content}</div>
+                        <p className="font-semibold text-lg text-base-content p-2 rounded-md cursor-pointer">
+                          {user.username}
+                        </p>
                       </div>
-                    </>
-                  )}
-                </>
-              ))}
+                    ))}
+                  </aside>
+                </div>
+              </div>
+            </div>
+            <div
+              ref={chatContainerRef}
+              className="overflow-y-auto flex-grow no-scrollbar"
+            >
+              <div className="overflow-hidden md:p-5">
+                {chats.map((chat, index) => (
+                  <>
+                    {chat.sender._id === userId ? (
+                      <>
+                        <div key={index} className="chat chat-end">
+                          <div className="chat-header mr-1">
+                            {chat.sender.username}
+                          </div>
+                          <div className="chat-bubble chat-bubble-accent text-white">
+                            {chat.content}
+                          </div>
+                          <div className="chat-footer opacity-50">
+                            {format(chat.createdAt, "custom-time-template")}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div key={index} className="chat chat-start">
+                          <div className="chat-header ml-1">
+                            {chat.sender.username}
+                          </div>
+                          <div className="chat-bubble text-white">
+                            {chat.content}
+                          </div>
+                          <div className="chat-footer opacity-50">
+                            {format(chat.createdAt, "custom-time-template")}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </>
+                ))}
+              </div>
             </div>
             <div className="flex mt-2">
               <InputEmoji
@@ -129,7 +256,6 @@ console.log(groupId)
                 shouldReturn
                 placeholder="Type your message..."
                 borderRadius={10}
-                fontSize={20}
               />
               <button
                 onClick={handleSendMessage}

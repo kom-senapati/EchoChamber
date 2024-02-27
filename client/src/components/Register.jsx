@@ -1,60 +1,58 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { parseCookies, setCookie } from "nookies";
 
 function Register() {
+  const apiEndpoint = "http://localhost:3000/";
 
-  const apiEndpoint = 'http://localhost:3000/'
-
-  const cookie = parseCookies()
-  const userId =  cookie['userId']
-  const navigate = useNavigate()
-  if(userId !== undefined){
-    navigate('/home')
+  const cookie = parseCookies();
+  const userId = cookie["userId"];
+  const navigate = useNavigate();
+  if (userId !== undefined) {
+    navigate("/home");
   }
   const [data, setData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirm_password: ''
+    username: "",
+    email: "",
+    password: "",
+    confirm_password: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleOnChange = (e) => {
-    setData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-
-  }
+    setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
   const handleOnSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     /* console.log(data) */
     try {
       if (data.password !== data.confirm_password) {
-        setError('passwords do not match');
-        return
+        setError("passwords do not match");
+        return;
       }
       const resp = await axios.post(`user/register`, {
         username: data.username,
         email: data.email,
-        password: data.password
-      })
-      if (resp.status == 200 && resp.statusText === 'OK') {
-        console.log(resp.data)
-        alert(resp.data.message)
-        setCookie(null,'userId', resp.data.data._id)
-        navigate('/login')
+        password: data.password,
+      });
+      if (resp.status == 200 && resp.statusText === "OK") {
+        console.log(resp.data);
+        alert(resp.data.message);
+        setCookie(null, "userId", resp.data.data._id);
+        navigate("/login");
       }
     } catch (error) {
-      console.log(setError)
+      console.log(setError);
     }
 
     setData({
-      username: '',
-      email: '',
-      password: '',
-      confirm_password: ''
-    })
-  }
+      username: "",
+      email: "",
+      password: "",
+      confirm_password: "",
+    });
+  };
   return (
     <div className="hero min-h-screen bg-base-200">
       <div className="hero-content flex-col lg:flex-row-reverse">
@@ -123,14 +121,21 @@ function Register() {
                 onChange={handleOnChange}
               />
             </div>
-            {
-              error !== '' &&
+            {error !== "" && (
               <p className="text-red-500 text-sm p-1">{error}</p>
-            }
+            )}
             <div className="form-control mt-3">
-              <button type="submit" className="btn btn-primary">Register</button>
+              <button type="submit" className="btn btn-primary">
+                Register
+              </button>
             </div>
           </form>
+          <div className="card-body inline-block pt-0">
+            Already a User ?{" "}
+            <Link to="/login" className="hover:text-accent">
+              Login
+            </Link>
+          </div>
         </div>
       </div>
     </div>

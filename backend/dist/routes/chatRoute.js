@@ -47,6 +47,20 @@ route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(401).json({ errormessage: error.message });
     }
 }));
+route.get('/getChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!req.query.chamberId)
+            res.status(400).json({ errormessage: 'invalid Id' });
+        else {
+            let chamber = yield db_1.Chat.find({ _id: req.query.chamberId }).populate("users", "-password");
+            res.status(200).json(chamber);
+        }
+    }
+    catch (error) {
+        console.log(error.message);
+        res.status(401).json({ errormessage: error.message });
+    }
+}));
 route.post('/creategroup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { groupusers, groupname, user } = req.body;
     if (!groupusers || !groupname) {
