@@ -7,8 +7,8 @@ const route = express.Router();
 
 route.get('/getmessage', async (req: Request, res: Response) => {
   try {
-    console.log(req.query.chatId)
-    const messages = await Message.find({ chat: req.query.chatId }).populate("sender").populate("chat");
+/*     console.log(req.query.chatId)
+ */    const messages = await Message.find({ chat: req.query.chatId }).populate("sender").populate("chat");
     res.status(200).json(messages)
   } catch (error: any) {
     console.log(error);

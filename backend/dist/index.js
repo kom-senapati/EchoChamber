@@ -11,10 +11,11 @@ const userRoute_1 = __importDefault(require("./routes/userRoute"));
 const messageRoute_1 = __importDefault(require("./routes/messageRoute"));
 const chatRoute_1 = __importDefault(require("./routes/chatRoute"));
 const socket_io_1 = require("socket.io");
+const socketService_1 = __importDefault(require("./socket/socketService"));
 const app = (0, express_1.default)();
-const PORT = 3000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
+const PORT = 3000;
 app.use('/user', userRoute_1.default);
 app.use('/message', messageRoute_1.default);
 app.use('/chat', chatRoute_1.default);
@@ -31,29 +32,21 @@ const io = new socket_io_1.Server(server, {
     pingTimeout: 60000,
     cors: {
         origin: "http://localhost:5173",
-        // credentials: true,
     },
 });
-io.on('connection', (socket) => {
-    console.log('socket io connected');
-    socket.on("setup", (userData) => {
-        socket.join(userData._id);
-        console.log('yes connectes');
-        socket.emit("connected");
-    });
-    socket.on("join-chat", (room) => {
-        socket.join(room);
-        console.log("User Joined Room: " + room);
-    });
-    socket.on("new-message", (newMessageRecieved) => {
-        console.log(newMessageRecieved);
-        var chat = newMessageRecieved.chat;
-        if (!chat.users)
-            return console.log("chat.users not defined");
-        chat.users.forEach((user) => {
-            if (user._id == newMessageRecieved.sender._id)
-                return;
-            socket.to(chat._id).emit("new-message", newMessageRecieved);
-        });
-    });
-});
+(0, socketService_1.default)(io);
+/*  Trash, dont look here
+
+const httpServer = http.createServer(app);
+
+const socketServiceInstance = new SocketService();
+socketServiceInstance.initListeners();
+
+socketServiceInstance.io.attach(httpServer);
+
+httpServer.listen(PORT, () => {
+  console.log(`HTTP Server started at PORT:${PORT}`)
+
+})
+
+*/

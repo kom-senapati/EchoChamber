@@ -8,8 +8,8 @@ const route = express.Router();
 
 route.get('/getchats', async (req: Request, res: Response) => {
   try {
-    console.log(req.params.currentUserId)
-    if (!req.query.currentUserId) res.status(400).json({ errormessage: 'invalid Id' })
+/*     console.log(req.params.currentUserId)
+ */    if (!req.query.currentUserId) res.status(400).json({ errormessage: 'invalid Id' })
     else {
       let chats = await Chat.find({ users: { $elemMatch: { $eq: req.query.currentUserId } } }).populate("users", "-password").populate("groupAdmin", "-password").populate("latestMessage").sort({ updatedAt: -1 })
 
@@ -72,8 +72,8 @@ route.post('/creategroup', async (req: Request, res: Response) => {
   if (!groupusers || !groupname) {
     return res.status(400).send({ message: "Please Fill all the feilds" });
   }
-  console.log(req.body);
-
+  /*   console.log(req.body);
+   */
   if (groupusers.length < 2) {
     return res
       .status(400)

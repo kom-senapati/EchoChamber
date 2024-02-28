@@ -58,15 +58,14 @@ const Chat = () => {
   register("custom-time-template", customTimeTemplate);
 
   useEffect(() => {
+    socket = io(ENDPOINT);
     getUsers();
     fetchMessages();
-    socket = io(ENDPOINT);
   }, []);
-  console.log(groupId);
+
 
   useEffect(() => {
     socket.on("new-message", (incoming_message) => {
-      console.log("incoming_message");
       setChats([...chats, incoming_message]);
     });
     // Scroll chat container to the bottom
@@ -83,7 +82,7 @@ const Chat = () => {
       setChamber(resp.data[0].chatName);
       setUsers(resp.data[0].users);
       if (resp.status == 200) {
-        console.log(resp.data);
+        /* console.log(resp.data); */
       }
     } catch (error) {
       console.log(error);
@@ -100,8 +99,8 @@ const Chat = () => {
       if (resp.status == 200) {
         if (resp.data) {
           setChats(resp.data);
-          setSelectedChat(resp.data[0]?.chat._id);
-        }
+/*           setSelectedChat(resp.data[0]?.chat._id);
+ */        }
 
         socket.emit("join-chat", groupId);
       }
@@ -124,9 +123,8 @@ const Chat = () => {
         chatId: groupId,
       });
       if (resp.status == 200) {
-        console.log(resp.data);
         socket.emit("new-message", resp.data);
-        setChats([...chats, resp.data]);
+        /*  setChats([...chats, resp.data]); */
       }
       setMessage("");
     } catch (error) {
@@ -149,8 +147,8 @@ const Chat = () => {
             <h3 className="py-4 text-xl font-bold mb-2 text-accent">
               Users in {chamber}
             </h3>
-            {users.map((user, i) => (
-              <div className="flex items-center">
+            {users.map((user, idx) => (
+              <div key={idx} className="flex items-center">
                 <div className="avatar">
                   <div className="w-8 rounded-box">
                     <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
@@ -192,8 +190,8 @@ const Chat = () => {
                     <h3 className="py-4 text-xl font-bold mb-2 text-accent">
                       Users in {chamber}
                     </h3>
-                    {users.map((user, i) => (
-                      <div className="flex items-center">
+                    {users.map((user, idx) => (
+                      <div key={idx} className="flex items-center">
                         <div className="avatar">
                           <div className="w-8 rounded-box">
                             <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
@@ -214,7 +212,7 @@ const Chat = () => {
             >
               <div className="overflow-hidden md:p-5">
                 {chats.map((chat, index) => (
-                  <>
+                  <div key={index}>
                     {chat.sender._id === userId ? (
                       <>
                         <div key={index} className="chat chat-end">
@@ -244,7 +242,7 @@ const Chat = () => {
                         </div>
                       </>
                     )}
-                  </>
+                  </div>
                 ))}
               </div>
             </div>

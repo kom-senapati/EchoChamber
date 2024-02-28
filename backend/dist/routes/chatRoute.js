@@ -18,8 +18,8 @@ const db_1 = require("../db");
 const route = express_1.default.Router();
 route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.params.currentUserId);
-        if (!req.query.currentUserId)
+        /*     console.log(req.params.currentUserId)
+         */ if (!req.query.currentUserId)
             res.status(400).json({ errormessage: 'invalid Id' });
         else {
             let chats = yield db_1.Chat.find({ users: { $elemMatch: { $eq: req.query.currentUserId } } }).populate("users", "-password").populate("groupAdmin", "-password").populate("latestMessage").sort({ updatedAt: -1 });
@@ -80,7 +80,8 @@ route.post('/creategroup', (req, res) => __awaiter(void 0, void 0, void 0, funct
     if (!groupusers || !groupname) {
         return res.status(400).send({ message: "Please Fill all the feilds" });
     }
-    console.log(req.body);
+    /*   console.log(req.body);
+     */
     if (groupusers.length < 2) {
         return res
             .status(400)
