@@ -17,6 +17,7 @@ export default function Dummychat() {
   const [userFromDB, setuserFromDB] = useState([]);
   const { currentUser, setCurrentUser } = useContext(userInfo);
   const navigate = useNavigate();
+  const [grpSkeleton, setGrpSkeleton] = useState(false);
 
   const cookie = parseCookies();
   const userId = cookie["userId"];
@@ -38,6 +39,7 @@ export default function Dummychat() {
   console.log(userId);
   const getGroups = useCallback(async () => {
     try {
+      setGrpSkeleton(true);
       const resp = await axios.get(`/chat/getchats`, {
         params: {
           currentUserId: userId,
@@ -46,8 +48,10 @@ export default function Dummychat() {
       if (resp.status == 200) {
         /* console.log(resp.data); */
         setChats(resp.data);
+        setGrpSkeleton(false);
       }
     } catch (error) {
+      setGrpSkeleton(false);
       console.log(error);
     }
   }, [chats]);
@@ -99,17 +103,25 @@ export default function Dummychat() {
             Available Rooms
           </h3>
           <div className="space-y-1 h-full text-base-content menu bg-base-200 rounded-box">
-            {chats?.map((chat) => (
-              <div
-                key={chat._id}
-                className=""
-                onClick={() => navigate(`group/${chat._id}`)}
-              >
-                <p className="font-semibold text-lg hover:bg-neutral hover:text-neutral-content p-2 rounded-md cursor-pointer">
-                  {chat.chatName}
-                </p>
-              </div>
-            ))}
+            {
+              grpSkeleton ? (<div>
+                <div className="skeleton rounded-sm h-9 mb-3 w-full"></div>
+                <div className="skeleton h-9 rounded-sm mb-3 w-full"></div>
+                <div className="skeleton h-9 rounded-sm mb-3 w-full"></div>
+                <div className="skeleton h-9 rounded-sm mb-3 w-full"></div>
+                <div className="skeleton h-9 rounded-sm mb-3 w-full"></div>
+              </div>) : chats?.map((chat) => (
+                <div
+                  key={chat._id}
+                  className=""
+                  onClick={() => navigate(`group/${chat._id}`)}
+                >
+                  <p className="font-semibold text-lg hover:bg-neutral hover:text-neutral-content p-2 rounded-md cursor-pointer">
+                    {chat.chatName}
+                  </p>
+                </div>
+              ))
+            }
           </div>
         </aside>
         <aside className="flex-[3] h-full w-full  flex flex-col items-center justify-center p-4">
@@ -123,7 +135,7 @@ export default function Dummychat() {
               value={joinRoomName}
               onChange={(e) => setJoinRoomName(e.target.value)}
             />
-            {}
+            { }
             <div className="w-full text-center">
               <button
                 onClick={handleJoinRoom}
