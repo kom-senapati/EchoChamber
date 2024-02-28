@@ -4,6 +4,7 @@ import { users } from "../utils";
 import { userInfo } from "../App";
 import axios from "axios";
 import { parseCookies } from "nookies";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
 
 export default function Dummychat() {
   const apiEndpoint = "http://localhost:3000/";
@@ -56,7 +57,6 @@ export default function Dummychat() {
       setError("Room name should atleast contain 4 character!!");
       return;
     }
-    document.getElementById("my_modal_2").showModal();
     setError("");
   };
 
@@ -80,10 +80,10 @@ export default function Dummychat() {
   console.log(selectedUsers);
   return (
     <main className="h-full w-full flex items-center justify-center">
-      <section className="h-[80%] w-full max-w-7xl bg-base-content shadow-md rounded-md flex">
-        <aside className="flex-[1] h-full w-full  px-8 py-12 flex flex-col">
-          <h3 className="p-2 text-xl font-bold mb-4 text-primary">
-            Available Rooms :
+      <section className="h-[80%] w-full max-w-7xl bg-base-200 mx-[50px] shadow-md border border-gray-700 rounded-md flex">
+        <aside className="flex-[1] h-full w-full  px-8 py-12 flex flex-col border-r-2 border-base-100">
+          <h3 className="p-2 text-xl font-bold mb-4 text-accent">
+            Available Rooms
           </h3>
           <div className="space-y-1 h-full text-base-content menu bg-base-200 rounded-box">
             {chats?.map((chat) => (
@@ -99,40 +99,59 @@ export default function Dummychat() {
             ))}
           </div>
         </aside>
-        <aside className="flex-[3] h-full w-full  flex flex-col items-start p-4">
-          <p className=" absolute text-xs text-error">{error}</p>
-
-          <form className="space-y-2 pt-10" onSubmit={handleSubmit}>
+        <aside className="flex-[3] h-full w-full  flex flex-col items-center justify-center p-4">
+          <AiOutlineUsergroupAdd
+            size={40}
+            className="text-center"
+          />
+          <p className="text-xs text-error">{error}</p>
+          <form className="space-y-2 pt-7" onSubmit={handleSubmit}>
             <input
               type="text"
               placeholder="Type here"
               className="input input-bordered w-full max-w-xs"
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
             />
-            {}
-            <button className="btn w-full ">Create Room</button>
+            { }
+            <div className="w-full text-center">
+              <button className="btn hover:text-base-content text-primary-content w-full bg-accent">Join Room</button>
+              <span className="py-1">Or</span>
+              <button onClick={() => {
+                document.getElementById("my_modal_2").showModal();
+              }} className="btn hover:text-base-content text-primary-content w-full bg-accent">Create Room</button>
+            </div>
+
           </form>
           <p className="text-md py-2 px-1">
             Join a existing group or make a new one
           </p>
           {/* modal */}
           {/* Open the modal using document.getElementById('ID').showModal() method */}
-          <dialog id="my_modal_2" className="modal ">
+          <dialog id="my_modal_2" className="modal min-h-96">
             <div className="modal-box flex flex-col gap-2 overflow-visible">
-              <h3 className="font-bold text-lg">
-                Add room members: {roomName}
+              <h3 className="font-bold text-lg text-center">
+                Create room:
               </h3>
-              <div className="relative py-1 flex  w-full gap-2">
+              <div className="flex flex-col w-full gap-2">
+                <label htmlFor="roomName">Enter Room Name:</label>
+                <input
+                  id="roomName"
+                  type="text"
+                  placeholder="Type here"
+                  className="input input-bordered w-full py-1"
+                  value={roomName}
+                  onChange={(e) => setRoomName(e.target.value)}
+                />
+                <label htmlFor="roomName">Add Users:</label>
                 <input
                   type="text"
                   placeholder="Type here"
-                  className="input input-bordered w-full max-w-60 dropdown dropdown-bottom"
+                  className="input input-bordered w-full py-1 "
                   value={searchUserTerm}
                   onChange={(e) => setsearchUserTerm(e.target.value)}
                 />
                 {/* Selected user list */}
-                <div className="flex flex-col max-h-32 bg-white rounded-md overflow-y-scroll w-full">
+                  <p className="text-accent font-semibold py-2">Selected Users</p>
+                <div className="h-32 w-full bg-base-200 rounded-md overflow-y-scroll">
                   {selectedUsers &&
                     selectedUsers.length !== 0 &&
                     selectedUsers.map((user, idx) => (
@@ -150,35 +169,35 @@ export default function Dummychat() {
                     ))}
                 </div>
 
-                {/* User select input */}
-                <div className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                  {userFromDB?.filter((user) =>
-                    user.username.includes(searchUserTerm)
-                  ).length !== 0 && searchUserTerm !== "" ? (
-                    <div className=" h-32 -bottom-20 overflow-scroll w-60 z-10 bg-white rounded-md absolute ">
-                      {userFromDB
-                        .filter((user) => user._id !== userId)
-                        .filter((user) =>
-                          user.username.includes(searchUserTerm)
-                        )
-                        .map((usr) => (
-                          <div
-                            key={usr._id}
-                            className="p-2 cursor-pointer"
-                            onClick={() =>
-                              setSelectedUsers((prev) => [...prev, usr])
-                            }
-                          >
-                            {usr.username}
-                          </div>
-                        ))}
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-              <button className="btn" onClick={createRoomClick}>
+                  {/* User select input */}
+                  <div className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                    {userFromDB?.filter((user) =>
+                      user.username.includes(searchUserTerm)
+                    ).length !== 0 && searchUserTerm !== "" ? (
+                      <div className=" h-44 -bottom-[-75px] right-[1.41rem] overflow-y-scroll w-60 z-10 bg-base-200 rounded-md absolute ">
+                        {userFromDB
+                          .filter((user) => user._id !== userId)
+                          .filter((user) =>
+                            user.username.includes(searchUserTerm)
+                          )
+                          .map((usr) => (
+                            <div
+                              key={usr._id}
+                              className="p-2 cursor-pointer"
+                              onClick={() =>
+                                setSelectedUsers((prev) => [...prev, usr])
+                              }
+                            >
+                              {usr.username}
+                            </div>
+                          ))}
+                      </div>
+                    ) : null}
+              <button className="btn hover:text-base-content text-primary-content bg-accent w-full" onClick={createRoomClick}>
                 Create room
               </button>
+            </div>
+            </div>
             </div>
           </dialog>
         </aside>

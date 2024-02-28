@@ -82,7 +82,7 @@ function Login() {
           </form>
           <div className="card-body inline-block pt-0">
             Dont have an account ?{" "}
-            <Link to="/" className="hover:text-accent">
+            <Link to="/register" className="hover:text-accent">
               Register
             </Link>
           </div>
