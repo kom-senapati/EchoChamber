@@ -4,6 +4,7 @@ import axios from "axios";
 import { parseCookies, setCookie } from "nookies";
 
 function Register() {
+  const [loading, setLoading] = useState(false);
   const apiEndpoint = "http://localhost:3000/";
 
   const cookie = parseCookies();
@@ -27,6 +28,7 @@ function Register() {
     e.preventDefault();
     /* console.log(data) */
     try {
+      setLoading(true);
       if (data.password !== data.confirm_password) {
         setError("passwords do not match");
         return;
@@ -37,12 +39,14 @@ function Register() {
         password: data.password,
       });
       if (resp.status == 200 && resp.statusText === "OK") {
+        setLoading(false);
         console.log(resp.data);
         alert(resp.data.message);
         setCookie(null, "userId", resp.data.data._id);
         navigate("/login");
       }
     } catch (error) {
+      setLoading(false);
       console.log(setError);
     }
 
@@ -63,7 +67,7 @@ function Register() {
             groups in real-time.
           </p>
         </div>
-        <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+        <div className="card shrink-0 w-full max-w-md shadow-2xl bg-base-100">
           <form className="card-body" onSubmit={handleOnSubmit}>
             <div className="form-control">
               <label className="label">
@@ -125,8 +129,12 @@ function Register() {
               <p className="text-red-500 text-sm p-1">{error}</p>
             )}
             <div className="form-control mt-3">
-              <button type="submit" className="btn btn-primary">
-                Register
+              <button type="submit" className="btn btn-accent">
+                {loading ? (
+                  <span className="loading loading-infinity loading-lg"></span>
+                ) : (
+                  "Register"
+                )}
               </button>
             </div>
           </form>

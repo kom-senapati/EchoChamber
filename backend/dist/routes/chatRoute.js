@@ -61,6 +61,20 @@ route.get('/getChatById', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(401).json({ errormessage: error.message });
     }
 }));
+route.get('/updateChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!req.query.chamberId || !req.query.userId)
+            res.status(400).json({ errormessage: 'invalid Chamber Id or user id' });
+        else {
+            let updatedChamber = yield db_1.Chat.findOneAndUpdate({ _id: req.query.chamberId }, { $push: { users: req.query.userId } }, { new: true }).populate("users", "-password");
+            res.status(200).json(updatedChamber);
+        }
+    }
+    catch (error) {
+        console.log(error.message);
+        res.status(401).json({ errormessage: error.message });
+    }
+}));
 route.post('/creategroup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { groupusers, groupname, user } = req.body;
     if (!groupusers || !groupname) {

@@ -5,6 +5,7 @@ import { userInfo } from "../App";
 import { parseCookies, setCookie } from "nookies";
 
 function Login() {
+  const [loading, setLoading] = useState(false);
   const apiEndpoint = "http://localhost:3000/";
   const { currentUser, setCurrentUser } = useContext(userInfo);
   const cookie = parseCookies();
@@ -21,15 +22,18 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const resp = await axios.post(`${apiEndpoint}user/login`, data);
       console.log(resp);
       if (resp.status === 200 && resp.statusText === "OK") {
+        setLoading(false);
         console.log(resp?.data?.data._id);
         setCurrentUser(resp.data);
         setCookie(null, "userId", resp?.data?.data._id);
         navigate("/home");
       }
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
   };
@@ -75,8 +79,12 @@ function Login() {
               />
             </div>
             <div className="form-control mt-6">
-              <button type="submit" className="btn btn-primary">
-                Login
+              <button type="submit" className="btn btn-accent">
+                {loading ? (
+                  <span className="loading loading-infinity loading-lg"></span>
+                ) : (
+                  "Login"
+                )}
               </button>
             </div>
           </form>

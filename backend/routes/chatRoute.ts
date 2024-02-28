@@ -52,6 +52,19 @@ route.get('/getChatById', async (req: Request, res: Response) => {
   }
 })
 
+route.get('/updateChatById', async (req: Request, res: Response) => {
+  try {
+    if (!req.query.chamberId || !req.query.userId) res.status(400).json({ errormessage: 'invalid Chamber Id or user id' })
+    else {
+      let updatedChamber = await Chat.findOneAndUpdate({ _id: req.query.chamberId }, { $push: { users: req.query.userId } }, { new: true }).populate("users", "-password")
+      res.status(200).json(updatedChamber);
+    }
+  } catch (error: any) {
+    console.log(error.message);
+    res.status(401).json({ errormessage: error.message })
+  }
+})
+
 route.post('/creategroup', async (req: Request, res: Response) => {
 
   const { groupusers, groupname, user } = req.body
