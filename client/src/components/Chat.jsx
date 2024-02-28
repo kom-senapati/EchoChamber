@@ -79,10 +79,11 @@ const Chat = () => {
           chamberId: groupId,
         },
       });
-      setChamber(resp.data[0].chatName);
-      setUsers(resp.data[0].users);
+      
       if (resp.status == 200) {
         /* console.log(resp.data); */
+        setChamber(resp.data[0].chatName);
+        setUsers(resp.data[0].users);
       }
     } catch (error) {
       console.log(error);

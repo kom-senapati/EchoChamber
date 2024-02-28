@@ -70,6 +70,16 @@ route.get('/getUsers', async (req: Request, res: Response) => {
     res.status(401).json({ errormessage: error.message })
   }
 })
+route.get('/getUsersById', async (req: Request, res: Response) => {
+  try {
+    const user = await User.find({_id: req.query.userId})
+    if (!user) res.status(401).json({ message: ' user with specific not foound' })
+    res.status(200).json(user)
+  } catch (error: any) {
+    console.log(error);
+    res.status(401).json({ errormessage: error.message })
+  }
+})
 
 
 export default route

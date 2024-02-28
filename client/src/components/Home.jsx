@@ -8,14 +8,21 @@ import { AiOutlineUsergroupAdd } from "react-icons/ai";
 
 export default function Dummychat() {
   const apiEndpoint = "http://localhost:3000/";
+  const [currUser, setCurrentUser] = useState(null)
+
   const [joinRoomName, setJoinRoomName] = useState("");
   const [roomName, setRoomName] = useState("");
+
   const [error, setError] = useState("");
+
   const [searchUserTerm, setsearchUserTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
+
+  // chats and room names
   const [chats, setChats] = useState([]);
+  const [allChats, setAllChats] = useState([]);
+
   const [userFromDB, setuserFromDB] = useState([]);
-  const { currentUser, setCurrentUser } = useContext(userInfo);
   const navigate = useNavigate();
   const [grpSkeleton, setGrpSkeleton] = useState(false);
 
@@ -24,19 +31,41 @@ export default function Dummychat() {
   if (userId === undefined) {
     navigate("/login");
   }
-  useEffect(() => {
-    const fetchUser = async () => {
-      const resp = await axios.get("/user/getUsers");
-      console.log(resp.data.userList);
-      setuserFromDB(resp.data.userList);
-    };
-    fetchUser();
-  }, [userId]);
 
   useEffect(() => {
-    getGroups();
-  }, [userId]);
-  console.log(userId);
+    fetchUsers();
+    getGroups()
+    getAllGroups()
+    getuserFunc()
+  }, [userId ,]);
+
+
+  const fetchUsers = async () => {
+    const resp = await axios.get("/user/getUsers");
+    // console.log(resp.data.userList);
+    setuserFromDB(resp.data.userList);
+  };
+  const getuserFunc = async () => {
+    const getUser = await axios('/user/getUsersById',
+    {
+      params:{userId: userId}
+    })
+    if (getUser) {
+      setCurrentUser(getUser.data[0])
+    }
+  };
+  
+  const getAllGroups = useCallback(async () => {
+    try {
+      const resp = await axios.get(`/chat/getAllChats`);
+      if (resp.status == 200) {
+        setAllChats(resp.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [chats]);
+
   const getGroups = useCallback(async () => {
     try {
       setGrpSkeleton(true);
@@ -46,7 +75,6 @@ export default function Dummychat() {
         },
       });
       if (resp.status == 200) {
-        /* console.log(resp.data); */
         setChats(resp.data);
         setGrpSkeleton(false);
       }
@@ -56,45 +84,59 @@ export default function Dummychat() {
     }
   }, [chats]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (roomName === "" || roomName.length < 4) {
-      setError("Room name should atleast contain 4 character!!");
-      return;
-    }
-    setError("");
-  };
+  // Join-room Function
 
   const handleJoinRoom = async (e) => {
     e.preventDefault();
-    const filtered = chats.filter((chat) => chat.chatName === joinRoomName);
-    const resp = await axios.post("/chat/updateChatById", {
-      params: {
-        chamberId: filtered[0]._id,
-        userId,
-      },
-    });
-    console.log(resp);
+    setError('')
+    const filtered = allChats.filter((chat) => chat.chatName === joinRoomName);
+    if(filtered.length === 0){
+      setError('Room not found')
+    }else{
+      try {
+        const getChatByID = await axios.post('/chat/getChatById',{
+          chamberId:filtered[0]._id,
+      })
+      const isUserIn = getChatByID.data[0].users.filter((user) => user._id === userId)
+      if(!isUserIn.length >= 1){
+        const resp = await axios.post("/chat/updateChatById", {
+          chamberId: filtered[0]._id,
+          userId,
+        });
+      setChats((prev) => [...prev, resp.data]);
+      }else{
+        setError("You're already in this group")
+      }
+      } catch (error) {
+        console.log(error)
+      }
+    }
   };
 
-  const createRoomClick = () => {
-    console.log(roomName);
-    console.log(selectedUsers);
-    console.log(userId);
+
+  // Create-room function
+
+  const createRoomClick = (e) => {
+    e.preventDefault()
+
+    selectedUsers.push(currUser)
     const createRoom = async () => {
       const resp = await axios.post("/chat/creategroup", {
         groupusers: selectedUsers,
         groupname: roomName,
         user: userId,
       });
-      if (resp) {
-        console.log(resp);
+      if (resp.status === 200) {
+        setRoomName('')
+        setSelectedUsers([])
+        setsearchUserTerm('')
+        getGroups()
+
       }
     };
     createRoom();
   };
-
-  console.log(selectedUsers);
+console.log(chats.length, chats)
   return (
     <main className="h-full w-full flex items-center justify-center">
       <section className="h-[80%] w-full max-w-7xl bg-base-200 mx-[50px] shadow-md border border-gray-700 rounded-md flex">
@@ -126,8 +168,9 @@ export default function Dummychat() {
         </aside>
         <aside className="flex-[3] h-full w-full  flex flex-col items-center justify-center p-4">
           <AiOutlineUsergroupAdd size={40} className="text-center" />
+          
           <p className="text-xs text-error">{error}</p>
-          <form className="space-y-2 pt-7" onSubmit={handleSubmit}>
+          <div className="space-y-2 pt-7">
             <input
               type="text"
               placeholder="Type here"
@@ -152,8 +195,9 @@ export default function Dummychat() {
               >
                 Create Room
               </button>
+              </div>
             </div>
-          </form>
+          
           <p className="text-md py-2 px-1">
             Join a existing group or make a new one
           </p>
@@ -161,8 +205,10 @@ export default function Dummychat() {
           {/* Open the modal using document.getElementById('ID').showModal() method */}
           <dialog id="my_modal_2" className="modal min-h-96">
             <div className="modal-box flex flex-col gap-2 overflow-visible">
+          <form className="space-y-2 pt-7" onSubmit={createRoomClick}>
+
               <h3 className="font-bold text-lg text-center">Create room:</h3>
-              <div className="flex flex-col w-full gap-2">
+              <p className="text-xs text-error text-center">{error}</p>
                 <label htmlFor="roomName">Enter Room Name:</label>
                 <input
                   id="roomName"
@@ -172,6 +218,7 @@ export default function Dummychat() {
                   value={roomName}
                   onChange={(e) => setRoomName(e.target.value)}
                 />
+              <div className="flex flex-col w-full gap-2 relative">
                 <label htmlFor="roomName">Add Users:</label>
                 <input
                   type="text"
@@ -180,6 +227,38 @@ export default function Dummychat() {
                   value={searchUserTerm}
                   onChange={(e) => setsearchUserTerm(e.target.value)}
                 />
+                {/* User select input */}
+                
+                  {userFromDB?.filter((user) =>
+                    user.username.includes(searchUserTerm)
+                  ).length !== 0 && searchUserTerm !== "" ? (
+                    <div className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52  absolute right-10 top-16">
+                    <div className=" h-44 overflow-y-scroll w-60 z-10 bg-base-200 rounded-md">
+                      {userFromDB
+                        .filter((user) => user._id !== userId)
+                        .filter((user) =>
+                          user.username.includes(searchUserTerm)
+                        )
+                        .map((usr) => (
+                          <div
+                            key={usr._id}
+                            className="p-2 cursor-pointer"
+                            onClick={() =>{
+                              setError('')
+                              selectedUsers.includes(usr) ? 
+                              setError('user already selected') :
+                              setSelectedUsers((prev) => [...prev, usr])
+                            }
+                            }
+                          >
+                            {usr.username}
+                          </div>
+                        ))}
+                    </div>
+                        </div>
+                  ) : null}
+                  
+                </div>
                 {/* Selected user list */}
                 <p className="text-accent font-semibold py-2">Selected Users</p>
                 <div className="h-32 w-full bg-base-200 rounded-md overflow-y-scroll">
@@ -200,38 +279,14 @@ export default function Dummychat() {
                     ))}
                 </div>
 
-                {/* User select input */}
-                <div className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                  {userFromDB?.filter((user) =>
-                    user.username.includes(searchUserTerm)
-                  ).length !== 0 && searchUserTerm !== "" ? (
-                    <div className=" h-44 -bottom-[-75px] right-[1.41rem] overflow-y-scroll w-60 z-10 bg-base-200 rounded-md absolute ">
-                      {userFromDB
-                        .filter((user) => user._id !== userId)
-                        .filter((user) =>
-                          user.username.includes(searchUserTerm)
-                        )
-                        .map((usr) => (
-                          <div
-                            key={usr._id}
-                            className="p-2 cursor-pointer"
-                            onClick={() =>
-                              setSelectedUsers((prev) => [...prev, usr])
-                            }
-                          >
-                            {usr.username}
-                          </div>
-                        ))}
-                    </div>
-                  ) : null}
-                  <button
+                <button
                     className="btn hover:text-base-content text-primary-content bg-accent w-full"
-                    onClick={createRoomClick}
+                        type="submit"
                   >
                     Create room
                   </button>
-                </div>
-              </div>
+                  </form>
+              
             </div>
           </dialog>
         </aside>

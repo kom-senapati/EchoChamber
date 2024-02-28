@@ -39,11 +39,23 @@ route.get('/getchats', async (req: Request, res: Response) => {
   }
 })
 
-route.get('/getChatById', async (req: Request, res: Response) => {
+route.get('/getAllChats', async (req: Request, res: Response) => {
   try {
-    if (!req.query.chamberId) res.status(400).json({ errormessage: 'invalid Id' })
+   
+      let chambers = await Chat.find().populate("users", "-password")
+      res.status(200).json(chambers);
+    
+  } catch (error: any) {
+    console.log(error.message);
+    res.status(401).json({ errormessage: error.message })
+  }
+})
+
+route.post('/getChatById', async (req: Request, res: Response) => {
+  try {
+    if (!req.body.chamberId) res.status(400).json({ errormessage: 'invalid Id' })
     else {
-      let chamber = await Chat.find({ _id: req.query.chamberId }).populate("users", "-password")
+      let chamber = await Chat.find({ _id: req.body.chamberId }).populate("users", "-password")
       res.status(200).json(chamber);
     }
   } catch (error: any) {
@@ -52,11 +64,13 @@ route.get('/getChatById', async (req: Request, res: Response) => {
   }
 })
 
-route.get('/updateChatById', async (req: Request, res: Response) => {
+
+
+route.post('/updateChatById', async (req: Request, res: Response) => {
   try {
-    if (!req.query.chamberId || !req.query.userId) res.status(400).json({ errormessage: 'invalid Chamber Id or user id' })
+    if (!req.body.chamberId || !req.body.userId) res.status(400).json({ errormessage: 'invalid params' })
     else {
-      let updatedChamber = await Chat.findOneAndUpdate({ _id: req.query.chamberId }, { $push: { users: req.query.userId } }, { new: true }).populate("users", "-password")
+      let updatedChamber = await Chat.findOneAndUpdate({ _id: req.body.chamberId }, { $push: { users: req.body.userId } }, { new: true }).populate("users", "-password")
       res.status(200).json(updatedChamber);
     }
   } catch (error: any) {
