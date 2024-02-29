@@ -8,11 +8,13 @@ import InputEmoji from "react-input-emoji";
 import { IoSend } from "react-icons/io5";
 import { LuAlignRight } from "react-icons/lu";
 import { IoArrowBackCircleOutline } from "react-icons/io5";
+import { FaStar } from "react-icons/fa6";
 import io from "socket.io-client";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { format, register } from "timeago.js";
+import { AiOutlineFileProtect } from "react-icons/ai";
 
 const ENDPOINT = "http://localhost:3000";
 let socket, selectedChatCompare;
@@ -25,7 +27,7 @@ const Chat = () => {
   const [chats, setChats] = useState([]);
   const chatContainerRef = useRef(null);
   const [users, setUsers] = useState([]);
-  const [chamber, setChamber] = useState("");
+  const [chamber, setChamber] = useState(null);
 
   const navigate = useNavigate();
   const cookie = parseCookies();
@@ -74,15 +76,14 @@ const Chat = () => {
 
   const getUsers = useCallback(async () => {
     try {
-      const resp = await axios.get(`/chat/getChatById`, {
-        params: {
-          chamberId: groupId,
-        },
+      const resp = await axios.post(`/chat/getChatById`, {
+        chamberId: groupId,
       });
-      setChamber(resp.data[0].chatName);
-      setUsers(resp.data[0].users);
+
       if (resp.status == 200) {
-        /* console.log(resp.data); */
+        console.log(resp.data);
+        setChamber(resp.data[0]);
+        setUsers(resp.data[0].users);
       }
     } catch (error) {
       console.log(error);
@@ -145,9 +146,9 @@ const Chat = () => {
         <section className="flex h-full w-full md:h-[80%] md:w-[80%] border border-gray-700 rounded-md bg-neutral">
           <aside className="w-full flex-1 border-r border-gray-700 px-10 py-0 h-full menu bg-base-200 rounded hidden md:block">
             <h3 className="py-4 text-xl font-bold mb-2 text-accent">
-              Users in {chamber}
+              Users in {chamber?.chatName}
             </h3>
-            {users.map((user, idx) => (
+            {chamber?.users.map((user, idx) => (
               <div key={idx} className="flex items-center">
                 <div className="avatar">
                   <div className="w-8 rounded-box">
@@ -157,6 +158,14 @@ const Chat = () => {
                 <p className="font-semibold text-lg p-2 rounded-md cursor-pointer">
                   {user.username}
                 </p>
+                <div className="flex justify-center items-center gap-2">
+                  {
+                    chamber.groupAdmin === user._id ? <FaStar size={16} className="text-accent" /> : null
+                  }
+                  {
+                    userId === user._id ? "(you)" : null
+                  }
+                </div>
               </div>
             ))}
           </aside>
@@ -167,7 +176,7 @@ const Chat = () => {
               onClick={() => navigate(-1)}
             />
             <div className="flex items-center justify-between md:justify-center font-semibold text-center text-accent text-xl pt-2 pb-4 md:pt-2 md:pb-2 shadow-base-100 shadow-sm">
-              {chamber}
+              {chamber?.chatName}
               <div className="drawer md:hidden z-[5] w-fit">
                 <input
                   id="my-drawer"
@@ -188,9 +197,9 @@ const Chat = () => {
                   ></label>
                   <aside className="w-72 flex-1 border-r border-gray-700 px-10 h-full menu bg-base-200 rounded ">
                     <h3 className="py-4 text-xl font-bold mb-2 text-accent">
-                      Users in {chamber}
+                      Users in {chamber?.chatName}
                     </h3>
-                    {users.map((user, idx) => (
+                    {chamber?.users.map((user, idx) => (
                       <div key={idx} className="flex items-center">
                         <div className="avatar">
                           <div className="w-8 rounded-box">
@@ -200,6 +209,14 @@ const Chat = () => {
                         <p className="font-semibold text-lg text-base-content p-2 rounded-md cursor-pointer">
                           {user.username}
                         </p>
+                        <div className="flex justify-center items-center gap-2">
+                          {
+                            chamber.groupAdmin === user._id ? <FaStar size={16} className="text-accent" /> : null
+                          }
+                          {
+                            userId === user._id ? <span className="text-neutral">{"(you)"}</span> : null
+                          }
+                        </div>
                       </div>
                     ))}
                   </aside>

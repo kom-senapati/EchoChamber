@@ -78,4 +78,16 @@ route.get('/getUsers', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(401).json({ errormessage: error.message });
     }
 }));
+route.get('/getUsersById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield db_1.User.find({ _id: req.query.userId });
+        if (!user)
+            res.status(401).json({ message: ' user with specific not foound' });
+        res.status(200).json(user);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(401).json({ errormessage: error.message });
+    }
+}));
 exports.default = route;

@@ -23,7 +23,7 @@ function Login() {
     e.preventDefault();
     try {
       setLoading(true);
-      const resp = await axios.post(`${apiEndpoint}user/login`, data);
+      const resp = await axios.post(`/user/login`, data);
       console.log(resp);
       if (resp.status === 200 && resp.statusText === "OK") {
         setLoading(false);

@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const db_1 = require("../db");
 // -password means we dont need password when object is being populated
 const route = express_1.default.Router();
+
 route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         /*     console.log(req.params.currentUserId)
@@ -47,12 +48,22 @@ route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(401).json({ errormessage: error.message });
     }
 }));
-route.get('/getChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+route.get('/getAllChats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.query.chamberId)
+        let chambers = yield db_1.Chat.find().populate("users", "-password");
+        res.status(200).json(chambers);
+    }
+    catch (error) {
+        console.log(error.message);
+        res.status(401).json({ errormessage: error.message });
+    }
+}));
+route.post('/getChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!req.body.chamberId)
             res.status(400).json({ errormessage: 'invalid Id' });
         else {
-            let chamber = yield db_1.Chat.find({ _id: req.query.chamberId }).populate("users", "-password");
+            let chamber = yield db_1.Chat.find({ _id: req.body.chamberId }).populate("users", "-password");
             res.status(200).json(chamber);
         }
     }
@@ -61,12 +72,12 @@ route.get('/getChatById', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(401).json({ errormessage: error.message });
     }
 }));
-route.get('/updateChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+route.post('/updateChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.query.chamberId || !req.query.userId)
-            res.status(400).json({ errormessage: 'invalid Chamber Id or user id' });
+        if (!req.body.chamberId || !req.body.userId)
+            res.status(400).json({ errormessage: 'invalid params' });
         else {
-            let updatedChamber = yield db_1.Chat.findOneAndUpdate({ _id: req.query.chamberId }, { $push: { users: req.query.userId } }, { new: true }).populate("users", "-password");
+            let updatedChamber = yield db_1.Chat.findOneAndUpdate({ _id: req.body.chamberId }, { $push: { users: req.body.userId } }, { new: true }).populate("users", "-password");
             res.status(200).json(updatedChamber);
         }
     }
