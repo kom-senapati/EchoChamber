@@ -1,12 +1,35 @@
-# EchoChamber - Real-time Chat Application
+<h1 align="center">EchoChamber - Real-time Chat Application</h1>
 
-EchoChamber is a real-time chat application built with React, TypeScript, Node.js, MongoDB, Socket.io, Redis, and DaisyUI. This application allows users to engage in instant messaging, providing a seamless and responsive chat experience.
+<div align="center" width='900'>
+    EchoChamber is a real-time chat application built with React, TypeScript, Node.js, MongoDB, Socket.io, Redis, and DaisyUI. This application allows users to engage in instant messaging, providing a seamless and responsive chat experience.
+</div>
+&nbsp;
+<img alt="image" margin="12" src="https://github.com/kom-senapati/EchoChamber/blob/main/client/public/thumbnail-EchoChaMber.png">
 
-<img width="946" alt="image" src="https://github.com/kom-senapati/EchoChamber/assets/81561733/97aa661e-5c42-4770-9421-b31d6e351024">
+<video width="320" height="240" controls>
+  <source src="your_video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 
 
-## Features
+<h1 align="center">Tech-Stack</h1>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white">&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB">&nbsp;&nbsp;<img src="https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB">&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white">&nbsp;&nbsp;<img src="https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101">&nbsp;&nbsp;<img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white">
+</p>
+
+<h1 align="center">Introduction</h1>
+
+<div align="center" width='900'>
+Overview: echoChamber is an interactive real-time chat application that brings people together. Whether you’re connecting with friends, colleagues, or fellow enthusiasts, echoChamber provides a seamless platform for lively conversations. Sign up with ease, create your unique profile, and dive into dynamic chat rooms.
+</div>
+
+<h3 align="center"> -> Key Features <-</h3>
 
 - **Real-time Communication:** Utilizes Socket.io for real-time bidirectional communication between the server and clients, ensuring instant message delivery.
 
@@ -20,46 +43,70 @@ EchoChamber is a real-time chat application built with React, TypeScript, Node.j
 
 - **Scalability:** Incorporates Redis for handling the application's caching needs, improving overall performance and scalability.
 
-## Prerequisites
 
-Before running the application, make sure you have the following installed:
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
 
-- Node.js
-- npm or yarn
-- MongoDB
-- Redis
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+<h1 align="center">Running the project locally</h1>
 
 ## Getting Started
+1. **Fork the repository**
 
-1. **Clone the repository:**
+2. **Clone the forked repo to your local :**
 
     ```bash
     git clone https://github.com/your-username/EchoChamber.git
     cd EchoChamber
+    
 
-  2. **Install dependencies:**
+3. **Install dependencies for client:**
 
-      ```bash
-      npm install
+   ```bash
+   cd client
+   npm install
+
+4. **Install dependencies for backend:**
+
+   ```bash
+   cd backend
+   npm install
   
-  3. **Configure Environment Variables:**
+3. **Configure Environment Variables for backend:**
 
-      Create a .env file in the root of the project and configure the following variables:
+     >Create a .env file in the root of the project and configure the following variables:
 
-      ```env
-       MONGODB_URI=your_mongodb_connection_string
-       REDIS_URI=your_redis_connection_string
+   ```env
+    MONGODB_URI=your_mongodb_connection_string
+    REDIS_URI=your_redis_connection_string
 
-  4. **Start the Application:**
+ 4. **Start the Application for both client and backend:**
 
-       ```bash
-        npm start
-        or
-        yarn start
-  
-  The application should now be running at http://localhost:3000.
-
-
+    > Client -> development server will start at http://localhost:5173
+    ```bash
+      npm run dev
+    ```
+    > Backend ->  server will start at http://localhost:3000
+     ```bash
+      npm run dev
+    ```
 <br>
 
-Happy chatting with EchoChamber! 🚀
+<p align="center">
+ Happy chatting with EchoChamber! 🚀
+</p>
