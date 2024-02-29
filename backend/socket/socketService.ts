@@ -1,6 +1,5 @@
 import Redis from "ioredis";
-
-
+import "dotenv/config"
 
 type users = {
   _id: string;
@@ -70,12 +69,7 @@ const SocketFun = (io: any) => {
     sub.on("message", (channel, msg) => {
       if (channel === "MESSAGEOBJECT") {
         const msgObj: chatObj = JSON.parse(msg);
-        msgObj.chat.users.forEach((user: any) => {
-          if (msgObj.sender._id == user._id) return;
-          console.log("message from redis", msgObj.content);
-
-          socket.emit("new-message", msgObj)
-        });
+        socket.emit("new-message", msgObj)
       }
     });
   });

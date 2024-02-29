@@ -17,11 +17,13 @@ app.use(express.json());
 const PORT = 3000;
 
 
-
-
 app.use('/user', userRoute);
 app.use('/message', messageRoute)
 app.use('/chat', chatRoute)
+app.use('/', (req, res) => {
+  res.json('working')
+})
+
 
 if (process.env.db) {
   console.log(process.env.db);
@@ -30,7 +32,6 @@ if (process.env.db) {
 } else {
   console.log('cant connect to db');
 }
-
 
 
 const server = app.listen(PORT, () => console.log(`connected to ${PORT}`));
