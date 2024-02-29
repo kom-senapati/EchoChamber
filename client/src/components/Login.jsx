@@ -1,15 +1,11 @@
 import axios from "axios";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { userInfo } from "../App";
-import { parseCookies, setCookie } from "nookies";
+import {  setCookie } from "nookies";
 
 function Login() {
   const [loading, setLoading] = useState(false);
-  const apiEndpoint = "http://localhost:3000/";
-  const { currentUser, setCurrentUser } = useContext(userInfo);
-  const cookie = parseCookies();
-  const userId = cookie["userId"];
+  // const apiEndpoint = "http://localhost:3000/";
   const navigate = useNavigate();
   const [data, setData] = useState({
     email: "",
@@ -28,7 +24,6 @@ function Login() {
       if (resp.status === 200 && resp.statusText === "OK") {
         setLoading(false);
         console.log(resp?.data?.data._id);
-        setCurrentUser(resp.data);
         setCookie(null, "userId", resp?.data?.data._id);
         navigate("/home");
       }

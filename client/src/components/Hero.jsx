@@ -188,7 +188,7 @@ function Hero() {
           <div></div>
         </div>
         {/* <div className="w-"></div> */}
-        <div className="mockup-phone border-primary z-0 hidden md:block">
+        <div className="mockup-phone border-accent z-0 hidden md:block">
           <div className="camera"></div>
           <div className="display">
             <div className="artboard artboard-demo phone-1">Hello</div>

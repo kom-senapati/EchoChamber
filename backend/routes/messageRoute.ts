@@ -4,6 +4,7 @@ import { Message, User, Chat } from "../db"
 
 const route = express.Router();
 
+// [⁜]------<[ fetch a messages by its Room/ChatRoom's ID ]>------[⁜] //
 
 route.get('/getmessage', async (req: Request, res: Response) => {
   try {
@@ -16,6 +17,7 @@ route.get('/getmessage', async (req: Request, res: Response) => {
   }
 })
 
+// [⁜]------<[ Send a messages to Room/ChatRooms ]>------[⁜] //
 
 route.post('/sendmessage', async (req: Request, res: Response) => {
   const { userId, content, chatId } = req.body;

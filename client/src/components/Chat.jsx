@@ -20,25 +20,24 @@ const ENDPOINT = "http://localhost:3000";
 let socket, selectedChatCompare;
 
 const Chat = () => {
-  const apiEndpoint = "http://localhost:3000/";
-  const { groupId } = useParams();
-  // const { currentUser, setCurrentUser } = useContext(userInfo);
-  const [message, setMessage] = useState("");
+  // const apiEndpoint = "http://localhost:3000/";
   const [chats, setChats] = useState([]);
-  const chatContainerRef = useRef(null);
   const [users, setUsers] = useState([]);
+  const [message, setMessage] = useState("");
   const [chamber, setChamber] = useState(null);
+  
+  const chatContainerRef = useRef(null);
 
+  const { groupId } = useParams();
   const navigate = useNavigate();
+
   const cookie = parseCookies();
   const userId = cookie["userId"];
+
   if (userId === undefined) {
     navigate("/login");
   }
   const customTimeTemplate = (number, index, totalSec) => {
-    // number: the timeago / timein number;
-    // index: the index of array below;
-    // totalSec: total seconds between date to be formatted and today's date;
     return [
       ["just now", "right now"],
       ["%ssec ago", "in %s seconds"],
@@ -56,16 +55,17 @@ const Chat = () => {
       ["%syrs ago", "in %s years"],
     ][index];
   };
-  // register your custom with timeago
   register("custom-time-template", customTimeTemplate);
 
+
+  // Initial UseEffect
   useEffect(() => {
     socket = io(ENDPOINT);
-    getUsers();
+    getChatAndUsers();
     fetchMessages();
   }, []);
 
-
+  //Recieving incomming messages
   useEffect(() => {
     socket.on("new-message", (incoming_message) => {
       setChats([...chats, incoming_message]);
@@ -74,7 +74,8 @@ const Chat = () => {
     chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
   });
 
-  const getUsers = useCallback(async () => {
+  //Get Room/ChatRoom and User
+  const getChatAndUsers = useCallback(async () => {
     try {
       const resp = await axios.post(`/chat/getChatById`, {
         chamberId: groupId,
@@ -90,6 +91,7 @@ const Chat = () => {
     }
   }, [chats]);
 
+  //Fetching messages
   const fetchMessages = async () => {
     try {
       const resp = await axios.get(`/message/getmessage`, {

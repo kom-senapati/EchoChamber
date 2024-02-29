@@ -6,7 +6,6 @@ import userRoute from "./routes/userRoute"
 import messageRoute from "./routes/messageRoute"
 import chatRoute from "./routes/chatRoute"
 import { Server } from "socket.io"
-import http from "http"
 import SocketFun from "./socket/socketService";
 
 

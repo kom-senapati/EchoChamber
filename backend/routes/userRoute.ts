@@ -4,6 +4,7 @@ import { User } from "../db";
 const route = express.Router();
 
 
+// [⁜]------<[ Register a user]>------[⁜] //
 
 route.post('/register', async (req: Request, res: Response) => {
 
@@ -27,6 +28,7 @@ route.post('/register', async (req: Request, res: Response) => {
 })
 
 
+// [⁜]------<[ Login a user]>------[⁜] //
 
 route.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -48,6 +50,7 @@ route.post('/login', async (req: Request, res: Response) => {
   }
 })
 
+// [⁜]------<[ search a user ]>------[⁜] //
 
 route.get('/search', async (req: Request, res: Response) => {
   try {
@@ -60,6 +63,8 @@ route.get('/search', async (req: Request, res: Response) => {
   }
 })
 
+// [⁜]------<[ fetch all available users ]>------[⁜] //
+
 route.get('/getUsers', async (req: Request, res: Response) => {
   try {
     const userList = await User.find()
@@ -70,6 +75,9 @@ route.get('/getUsers', async (req: Request, res: Response) => {
     res.status(401).json({ errormessage: error.message })
   }
 })
+
+// [⁜]------<[ fetch a single users by its ID ]>------[⁜] //
+
 route.get('/getUsersById', async (req: Request, res: Response) => {
   try {
     const user = await User.find({_id: req.query.userId})
