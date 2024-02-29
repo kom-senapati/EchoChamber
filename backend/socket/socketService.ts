@@ -52,7 +52,7 @@ const SocketFun = (io: any) => {
     });
 
     socket.on("new-message", async (newMessageRecieved: chatObj) => {
-      console.log("incoming mesaage", newMessageRecieved.content);
+
       await pub.publish("MESSAGEOBJECT", JSON.stringify(newMessageRecieved));
       var chat = newMessageRecieved.chat;
       if (!chat.users) return console.log("chat.users not defined");

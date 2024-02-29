@@ -35,7 +35,6 @@ const SocketFun = (io) => {
             console.log("User Joined Room: " + room);
         });
         socket.on("new-message", (newMessageRecieved) => __awaiter(void 0, void 0, void 0, function* () {
-            console.log("incoming mesaage", newMessageRecieved.content);
             yield pub.publish("MESSAGEOBJECT", JSON.stringify(newMessageRecieved));
             var chat = newMessageRecieved.chat;
             if (!chat.users)

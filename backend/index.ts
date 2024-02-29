@@ -1,10 +1,10 @@
 import express from "express";
 import mongoose, { ConnectOptions } from "mongoose";
-import 'dotenv/config';
 import cors from "cors"
 import userRoute from "./routes/userRoute"
 import messageRoute from "./routes/messageRoute"
 import chatRoute from "./routes/chatRoute"
+import 'dotenv/config';
 import { Server } from "socket.io"
 import SocketFun from "./socket/socketService";
 

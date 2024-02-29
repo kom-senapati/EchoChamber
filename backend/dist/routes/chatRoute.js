@@ -49,26 +49,18 @@ route.post('/creategroup', (req, res) => __awaiter(void 0, void 0, void 0, funct
 // [⁜]------<[ fetch Rooms/chatRoom of a specific user ]>------[⁜] //
 route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        /*     console.log(req.params.currentUserId)
-         */ if (!req.query.currentUserId)
-            res.status(400).json({ errormessage: 'invalid Id' });
+        if (!req.query.currentUserId)
+            res.status(400).json({ errormessage: "invalid Id" });
         else {
-            let chats = yield db_1.Chat.find({ users: { $elemMatch: { $eq: req.query.currentUserId } } }).populate("users", "-password").populate("groupAdmin", "-password").populate("latestMessage").sort({ updatedAt: -1 });
-            /*       const chats = await Chat.aggregate([
-                    {
-                      $match: {
-                        _id: mongoose.Types.ObjectId(req.query.currentUserId),
-                        $or: [
-                          { groupAdmin: mongoose.Types.ObjectId(req.query.currentUserId) }, // Check for groupAdmin
-                          { users: { $elemMatch: { $eq: req.query.currentUserId } } }
-                           // Check if user is in users array
-                        ]
-                      }
-                    }
-                  ]); */
-            /*       console.log(chats);
-             */ const chatList = yield db_1.User.populate(chats, {
-                path: "latestMessage.sender"
+            let chats = yield db_1.Chat.find({
+                users: { $elemMatch: { $eq: req.query.currentUserId } },
+            })
+                .populate("users", "-password")
+                .populate("groupAdmin", "-password")
+                .populate("latestMessage")
+                .sort({ updatedAt: -1 });
+            const chatList = yield db_1.User.populate(chats, {
+                path: "latestMessage.sender",
             });
             res.status(200).json(chatList);
         }
@@ -93,7 +85,7 @@ route.get('/getAllChats', (req, res) => __awaiter(void 0, void 0, void 0, functi
 route.post('/getChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body.chamberId)
-            res.status(400).json({ errormessage: 'invalid Id' });
+            res.status(400).json({ errormessage: "invalid Id" });
         else {
             let chamber = yield db_1.Chat.find({ _id: req.body.chamberId }).populate("users", "-password");
             res.status(200).json(chamber);
@@ -108,11 +100,40 @@ route.post('/getChatById', (req, res) => __awaiter(void 0, void 0, void 0, funct
 route.post('/updateChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body.chamberId || !req.body.userId)
-            res.status(400).json({ errormessage: 'invalid params' });
+            res.status(400).json({ errormessage: "invalid params" });
         else {
             let updatedChamber = yield db_1.Chat.findOneAndUpdate({ _id: req.body.chamberId }, { $push: { users: req.body.userId } }, { new: true }).populate("users", "-password");
             res.status(200).json(updatedChamber);
         }
+    }
+    catch (error) {
+        console.log(error.message);
+        res.status(401).json({ errormessage: error.message });
+    }
+}));
+route.post('/creategroup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { groupusers, groupname, user } = req.body;
+    if (!groupusers || !groupname) {
+        return res.status(400).send({ message: "Please Fill all the feilds" });
+    }
+    /*   console.log(req.body);
+     */
+    if (groupusers.length < 2) {
+        return res
+            .status(400)
+            .send("More than 2 users are required to form a group chat");
+    }
+    try {
+        const groupChat = yield db_1.Chat.create({
+            chatName: groupname,
+            users: groupusers,
+            isGroupChat: true,
+            groupAdmin: user,
+        });
+        const fullGroupChat = yield db_1.Chat.findOne(groupChat._id)
+            .populate("users", "-password")
+            .populate("groupAdmin", "-password");
+        res.status(200).json(fullGroupChat);
     }
     catch (error) {
         console.log(error.message);
