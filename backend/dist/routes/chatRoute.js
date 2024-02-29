@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const db_1 = require("../db");
 // -password means we dont need password when object is being populated
 const route = express_1.default.Router();
+
 route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         /*     console.log(req.params.currentUserId)
