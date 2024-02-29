@@ -6,13 +6,6 @@
 &nbsp;
 <img alt="image" margin="12" src="https://github.com/kom-senapati/EchoChamber/blob/main/client/public/thumbnail-EchoChaMber.png">
 
-<video width="320" height="240" controls>
-  <source src="your_video.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
-
-
 <h1 align="center">Tech-Stack</h1>
 
 <p align="center">
@@ -49,6 +42,7 @@ Overview: echoChamber is an interactive real-time chat application that brings p
 &nbsp;
 &nbsp;
 &nbsp;
+
 
 
 &nbsp;
