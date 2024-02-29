@@ -19,6 +19,9 @@ const PORT = 3000;
 app.use('/user', userRoute_1.default);
 app.use('/message', messageRoute_1.default);
 app.use('/chat', chatRoute_1.default);
+app.use('/', (req, res) => {
+    res.json('working');
+});
 if (process.env.db) {
     console.log(process.env.db);
     mongoose_1.default.connect(process.env.db, { dbName: "chat" });
