@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { users } from "../utils";
-import { userInfo } from "../App";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 
 export default function Dummychat() {
-  const apiEndpoint = "http://localhost:3000/";
+  // const apiEndpoint = "http://localhost:3000/";
   const [currUser, setCurrentUser] = useState(null)
 
   const [joinRoomName, setJoinRoomName] = useState("");
@@ -23,8 +21,9 @@ export default function Dummychat() {
   const [allChats, setAllChats] = useState([]);
 
   const [userFromDB, setuserFromDB] = useState([]);
-  const navigate = useNavigate();
   const [grpSkeleton, setGrpSkeleton] = useState(false);
+  
+  const navigate = useNavigate();
 
   const cookie = parseCookies();
   const userId = cookie["userId"];
@@ -32,6 +31,7 @@ export default function Dummychat() {
     navigate("/login");
   }
 
+    //Initial UseEffect
   useEffect(() => {
     fetchUsers();
     getGroups()
@@ -136,7 +136,6 @@ export default function Dummychat() {
     };
     createRoom();
   };
-console.log(chats.length, chats)
   return (
     <main className="h-full w-full flex items-center justify-center">
       <section className="h-[80%] w-full max-w-7xl bg-base-200 mx-[50px] shadow-md border border-gray-700 rounded-md flex">
@@ -201,8 +200,6 @@ console.log(chats.length, chats)
           <p className="text-md py-2 px-1">
             Join a existing group or make a new one
           </p>
-          {/* modal */}
-          {/* Open the modal using document.getElementById('ID').showModal() method */}
           <dialog id="my_modal_2" className="modal min-h-96">
             <div className="modal-box flex flex-col gap-2 overflow-visible">
           <form className="space-y-2 pt-7" onSubmit={createRoomClick}>
@@ -227,6 +224,7 @@ console.log(chats.length, chats)
                   value={searchUserTerm}
                   onChange={(e) => setsearchUserTerm(e.target.value)}
                 />
+
                 {/* User select input */}
                 
                   {userFromDB?.filter((user) =>

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("../db");
 const route = express_1.default.Router();
+// [⁜]------<[ Register a user]>------[⁜] //
 route.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = req.body;
     try {
@@ -36,6 +37,7 @@ route.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function
         return res.status(401).json({ errormessage: error.message });
     }
 }));
+// [⁜]------<[ Login a user]>------[⁜] //
 route.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     if (email == "" || password == "") {
@@ -54,6 +56,7 @@ route.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(401).json({ errormessage: error.message });
     }
 }));
+// [⁜]------<[ search a user ]>------[⁜] //
 route.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userList = yield db_1.User.find({ username: { $regex: '.*' + req.query.search + '.*' } });
@@ -66,6 +69,7 @@ route.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(401).json({ errormessage: error.message });
     }
 }));
+// [⁜]------<[ fetch all available users ]>------[⁜] //
 route.get('/getUsers', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userList = yield db_1.User.find();
@@ -78,6 +82,7 @@ route.get('/getUsers', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(401).json({ errormessage: error.message });
     }
 }));
+// [⁜]------<[ fetch a single users by its ID ]>------[⁜] //
 route.get('/getUsersById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield db_1.User.find({ _id: req.query.userId });

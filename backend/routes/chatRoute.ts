@@ -4,7 +4,45 @@ import { User, Chat } from "../db";
 // -password means we dont need password when object is being populated
 const route = express.Router();
 
-route.get("/getchats", async (req: Request, res: Response) => {
+// [⁜]------<[ Create a single Room/ChatRoom  ]>------[⁜] //
+
+route.post('/creategroup', async (req: Request, res: Response) => {
+
+  const { groupusers, groupname, user } = req.body
+
+  if (!groupusers || !groupname) {
+    return res.status(400).send({ message: "Please Fill all the feilds" });
+  }
+  /*   console.log(req.body);
+   */
+  if (groupusers.length < 2) {
+    return res
+      .status(400)
+      .send("More than 2 users are required to form a group chat");
+  }
+
+  try {
+    const groupChat = await Chat.create({
+      chatName: groupname,
+      users: groupusers,
+      isGroupChat: true,
+      groupAdmin: user,
+    });
+    const fullGroupChat = await Chat.findOne(groupChat._id)
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password");
+
+    res.status(200).json(fullGroupChat);
+
+  } catch (error: any) {
+    console.log(error.message);
+    res.status(401).json({ errormessage: error.message })
+  }
+})
+
+// [⁜]------<[ fetch Rooms/chatRoom of a specific user ]>------[⁜] //
+
+route.get('/getchats', async (req: Request, res: Response) => {
   try {
     if (!req.query.currentUserId)
       res.status(400).json({ errormessage: "invalid Id" });
@@ -55,7 +93,10 @@ route.post("/getChatById", async (req: Request, res: Response) => {
   }
 });
 
-route.post("/updateChatById", async (req: Request, res: Response) => {
+
+// [⁜]------<[ update a single Room/ChatRoom by is ID ]>------[⁜] //
+
+route.post('/updateChatById', async (req: Request, res: Response) => {
   try {
     if (!req.body.chamberId || !req.body.userId)
       res.status(400).json({ errormessage: "invalid params" });
@@ -73,43 +114,6 @@ route.post("/updateChatById", async (req: Request, res: Response) => {
   }
 });
 
-route.post("/creategroup", async (req: Request, res: Response) => {
-  const { groupusers, groupname, user } = req.body;
 
-  if (!groupusers || !groupname) {
-    return res.status(400).send({ message: "Please Fill all the feilds" });
-  }
-  /*   console.log(req.body);
-   */
-  if (groupusers.length < 2) {
-    return res
-      .status(400)
-      .send("More than 2 users are required to form a group chat");
-  }
-
-  const isGroupNameExists = await Chat.exists(groupname)
-  if (isGroupNameExists) {
-    res
-      .status(400)
-      .send("Group with same name already exists");
-  }
-
-  try {
-    const groupChat = await Chat.create({
-      chatName: groupname,
-      users: groupusers,
-      isGroupChat: true,
-      groupAdmin: user,
-    });
-    const fullGroupChat = await Chat.findOne(groupChat._id)
-      .populate("users", "-password")
-      .populate("groupAdmin", "-password");
-
-    res.status(200).json(fullGroupChat);
-  } catch (error: any) {
-    console.log(error.message);
-    res.status(401).json({ errormessage: error.message });
-  }
-});
 
 export default route;

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("../db");
 const route = express_1.default.Router();
+// [⁜]------<[ fetch a messages by its Room/ChatRoom's ID ]>------[⁜] //
 route.get('/getmessage', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         /*     console.log(req.query.chatId)
@@ -26,6 +27,7 @@ route.get('/getmessage', (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(401).json({ errormessage: error.message });
     }
 }));
+// [⁜]------<[ Send a messages to Room/ChatRooms ]>------[⁜] //
 route.post('/sendmessage', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, content, chatId } = req.body;
     if (!content || !chatId || !userId) {

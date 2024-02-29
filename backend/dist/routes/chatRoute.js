@@ -16,7 +16,38 @@ const express_1 = __importDefault(require("express"));
 const db_1 = require("../db");
 // -password means we dont need password when object is being populated
 const route = express_1.default.Router();
-route.get("/getchats", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// [⁜]------<[ Create a single Room/ChatRoom  ]>------[⁜] //
+route.post('/creategroup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { groupusers, groupname, user } = req.body;
+    if (!groupusers || !groupname) {
+        return res.status(400).send({ message: "Please Fill all the feilds" });
+    }
+    /*   console.log(req.body);
+     */
+    if (groupusers.length < 2) {
+        return res
+            .status(400)
+            .send("More than 2 users are required to form a group chat");
+    }
+    try {
+        const groupChat = yield db_1.Chat.create({
+            chatName: groupname,
+            users: groupusers,
+            isGroupChat: true,
+            groupAdmin: user,
+        });
+        const fullGroupChat = yield db_1.Chat.findOne(groupChat._id)
+            .populate("users", "-password")
+            .populate("groupAdmin", "-password");
+        res.status(200).json(fullGroupChat);
+    }
+    catch (error) {
+        console.log(error.message);
+        res.status(401).json({ errormessage: error.message });
+    }
+}));
+// [⁜]------<[ fetch Rooms/chatRoom of a specific user ]>------[⁜] //
+route.get('/getchats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.query.currentUserId)
             res.status(400).json({ errormessage: "invalid Id" });
@@ -39,7 +70,8 @@ route.get("/getchats", (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(401).json({ errormessage: error.message });
     }
 }));
-route.get("/getAllChats", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// [⁜]------<[ fetch all available Rooms/ChatRooms ]>------[⁜] //
+route.get('/getAllChats', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let chambers = yield db_1.Chat.find().populate("users", "-password");
         res.status(200).json(chambers);
@@ -49,7 +81,8 @@ route.get("/getAllChats", (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(401).json({ errormessage: error.message });
     }
 }));
-route.post("/getChatById", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// [⁜]------<[ fetch a single Room/ChatRoom by is ID ]>------[⁜] //
+route.post('/getChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body.chamberId)
             res.status(400).json({ errormessage: "invalid Id" });
@@ -63,7 +96,8 @@ route.post("/getChatById", (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(401).json({ errormessage: error.message });
     }
 }));
-route.post("/updateChatById", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// [⁜]------<[ update a single Room/ChatRoom by is ID ]>------[⁜] //
+route.post('/updateChatById', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body.chamberId || !req.body.userId)
             res.status(400).json({ errormessage: "invalid params" });
@@ -77,7 +111,7 @@ route.post("/updateChatById", (req, res) => __awaiter(void 0, void 0, void 0, fu
         res.status(401).json({ errormessage: error.message });
     }
 }));
-route.post("/creategroup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+route.post('/creategroup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { groupusers, groupname, user } = req.body;
     if (!groupusers || !groupname) {
         return res.status(400).send({ message: "Please Fill all the feilds" });
@@ -88,12 +122,6 @@ route.post("/creategroup", (req, res) => __awaiter(void 0, void 0, void 0, funct
         return res
             .status(400)
             .send("More than 2 users are required to form a group chat");
-    }
-    const isGroupNameExists = yield db_1.Chat.exists(groupname);
-    if (isGroupNameExists) {
-        res
-            .status(400)
-            .send("Group with same name already exists");
     }
     try {
         const groupChat = yield db_1.Chat.create({
