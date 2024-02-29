@@ -5,11 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
-require("dotenv/config");
 const cors_1 = __importDefault(require("cors"));
 const userRoute_1 = __importDefault(require("./routes/userRoute"));
 const messageRoute_1 = __importDefault(require("./routes/messageRoute"));
 const chatRoute_1 = __importDefault(require("./routes/chatRoute"));
+require("dotenv/config");
 const socket_io_1 = require("socket.io");
 const socketService_1 = __importDefault(require("./socket/socketService"));
 const app = (0, express_1.default)();
@@ -19,6 +19,9 @@ const PORT = 3000;
 app.use('/user', userRoute_1.default);
 app.use('/message', messageRoute_1.default);
 app.use('/chat', chatRoute_1.default);
+app.use('/', (req, res) => {
+    res.json('working');
+});
 if (process.env.db) {
     console.log(process.env.db);
     mongoose_1.default.connect(process.env.db, { dbName: "chat" });

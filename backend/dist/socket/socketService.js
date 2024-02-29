@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ioredis_1 = __importDefault(require("ioredis"));
+require("dotenv/config");
 const pub = new ioredis_1.default({
     host: "redis-361e97a7-ebuthor-87b8.a.aivencloud.com",
     port: 15563,
@@ -34,7 +35,6 @@ const SocketFun = (io) => {
             console.log("User Joined Room: " + room);
         });
         socket.on("new-message", (newMessageRecieved) => __awaiter(void 0, void 0, void 0, function* () {
-            console.log("incoming mesaage", newMessageRecieved.content);
             yield pub.publish("MESSAGEOBJECT", JSON.stringify(newMessageRecieved));
             var chat = newMessageRecieved.chat;
             if (!chat.users)
@@ -48,12 +48,7 @@ const SocketFun = (io) => {
         sub.on("message", (channel, msg) => {
             if (channel === "MESSAGEOBJECT") {
                 const msgObj = JSON.parse(msg);
-                msgObj.chat.users.forEach((user) => {
-                    if (msgObj.sender._id == user._id)
-                        return;
-                    console.log("message from redis", msgObj.content);
-                    socket.emit("new-message", msgObj);
-                });
+                socket.emit("new-message", msgObj);
             }
         });
     });
