@@ -288,6 +288,9 @@ console.log(chats.length, chats)
                   </form>
               
             </div>
+            <form method="dialog" className="modal-backdrop">
+    <button>close</button>
+  </form>
           </dialog>
         </aside>
       </section>
