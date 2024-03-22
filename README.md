@@ -6,6 +6,13 @@
 &nbsp;
 <img alt="image" margin="12" src="https://github.com/kom-senapati/EchoChamber/blob/main/client/public/thumbnail-EchoChaMber.png">
 
+
+<h1 align="center">Demo Video</h1>
+
+https://github.com/kom-senapati/EchoChamber/assets/81561733/b658a84f-09a6-43a5-b3ec-d16ac8b84101
+
+
+
 <h1 align="center">Tech-Stack</h1>
 
 <p align="center">
